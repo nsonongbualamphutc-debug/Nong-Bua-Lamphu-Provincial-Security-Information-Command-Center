@@ -100,6 +100,21 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .btn.on{border-color:var(--ok);color:var(--ok);background:rgba(61,220,132,.08)}
 #pVoice.speaking{border-color:var(--ok);color:var(--ok);background:rgba(61,220,132,.14)}
 #pVoice.speaking::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1s infinite}
+.p-subtitle{
+  position:absolute;left:0;right:0;bottom:0;z-index:5;
+  display:none;justify-content:center;padding:0 6vw 26px;pointer-events:none;
+}
+.p-subtitle.show{display:flex;animation:subIn .3s ease}
+@keyframes subIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.p-subtitle span{
+  background:rgba(6,11,27,.9);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-left:3px solid var(--ok);
+  border-radius:14px;padding:12px 22px;max-width:1000px;
+  font-family:'Kanit',sans-serif;font-weight:500;font-size:clamp(15px,2vw,20px);
+  color:#EAF0FF;line-height:1.5;text-align:center;
+  box-shadow:0 10px 34px rgba(0,0,0,.5);
+}
+.p-subtitle span b{color:var(--gold-bright);font-family:'Chakra Petch';font-weight:700}
 .clock{font-family:'Chakra Petch';font-size:13px;color:var(--gold-bright);letter-spacing:1px}
 @media(max-width:760px){.clock{display:none}}
 
@@ -367,10 +382,37 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:.25s;border:none;padding:0}
 .dot.on{background:var(--gold-bright);transform:scale(1.35);box-shadow:0 0 8px rgba(240,199,94,.7)}
 @media(max-width:900px){.dots{display:none}}
-.p-body{flex:1;position:relative;background:#0A1128;overflow:hidden}
+.p-body{flex:1;position:relative;background:#0A1128;overflow:hidden;--kpi-h:0px}
 .p-body>.slide{position:absolute;inset:0;animation:slidein .5s ease}
 @keyframes slidein{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
-.p-body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.p-body iframe{position:absolute;top:var(--kpi-h,0);left:0;right:0;bottom:0;width:100%;height:calc(100% - var(--kpi-h,0px));border:0;background:#fff}
+.kpi-strip{
+  --ac:var(--gold);position:absolute;top:0;left:0;right:0;z-index:4;height:74px;
+  display:flex;align-items:center;gap:16px;padding:0 22px;
+  background:linear-gradient(180deg,rgba(6,11,27,.98),rgba(10,17,40,.95));
+  border-bottom:2px solid var(--ac);
+}
+.p-body:has(.kpi-strip){--kpi-h:76px}
+.kpi-strip .kpi-ic{
+  width:48px;height:48px;flex:none;border-radius:12px;font-size:25px;
+  display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--ac) 16%, transparent);
+  border:1px solid color-mix(in srgb,var(--ac) 45%, transparent);
+}
+.kpi-main{flex:1;min-width:0}
+.kpi-metric{font-family:'Kanit';font-size:12.5px;color:var(--ink-dim);line-height:1.2}
+.kpi-num{font-family:'Chakra Petch';font-weight:700;font-size:30px;color:var(--ac);line-height:1.1;display:flex;align-items:baseline;gap:7px}
+.kpi-unit{font-family:'Sarabun';font-weight:400;font-size:14px;color:var(--ink-dim)}
+.kpi-wait{font-family:'Kanit';font-size:18px;color:var(--ink-dim);font-weight:500}
+.kpi-box{flex:none;text-align:center;padding:0 16px;border-left:1px solid rgba(255,255,255,.1)}
+.kpi-box-l{font-size:11px;color:var(--ink-dim);font-family:'Kanit'}
+.kpi-box-v{font-family:'Kanit';font-weight:600;font-size:16px;color:var(--ink)}
+.kpi-status{flex:none;font-family:'Kanit';font-weight:600;font-size:13px;color:#08130A;border-radius:99px;padding:6px 16px}
+@media(max-width:820px){
+  .kpi-strip{height:auto;padding:9px 12px;gap:9px;flex-wrap:wrap}
+  .kpi-box{padding:0 9px}
+  .p-body:has(.kpi-strip){--kpi-h:112px}
+}
 .p-loading{
   position:absolute;inset:0;display:flex;flex-direction:column;gap:16px;
   align-items:center;justify-content:center;background:#0A1128;z-index:2;
@@ -627,6 +669,7 @@ footer b{color:var(--gold-bright);font-weight:600}
     <div class="dots" id="pDots"></div>
     <div class="p-nav">
       <button class="btn" id="pVoice" onclick="toggleVoice()" title="เปิด/ปิดเสียงบรรยาย (V)">🔇 เสียง AI</button>
+      <button class="btn" id="pRepeat" onclick="repeatNarration()" title="พูดซ้ำ (R)">↻</button>
       <button class="btn" id="pAuto" onclick="toggleAuto()" title="เล่นอัตโนมัติ (A)">⏵ อัตโนมัติ</button>
       <button class="btn" onclick="stepSlide(-1)" title="ก่อนหน้า (←)">◀</button>
       <button class="btn" onclick="stepSlide(1)" title="ถัดไป (→)">▶</button>
@@ -636,6 +679,7 @@ footer b{color:var(--gold-bright);font-weight:600}
     </div>
   </div>
   <div class="p-body" id="pBody"></div>
+  <div class="p-subtitle" id="pSubtitle"><span id="pSubText"></span></div>
 </div>
 
 <script>
@@ -819,7 +863,7 @@ function openPresent(di){
 }
 function closePresent(){
   present.classList.remove('open'); document.body.style.overflow='';
-  stopAuto(); stopSpeak(); pBody.innerHTML='';
+  stopAuto(); stopSpeak(); document.getElementById('pSubtitle')?.classList.remove('show'); pBody.innerHTML='';
 }
 function stepSlide(dir){ gotoSlide((cur + dir + TOTAL) % TOTAL); }
 
@@ -865,9 +909,27 @@ function gotoSlide(i){
 
   if(d.overview){ renderOverview(); narrateSlide(i); return }
 
-  /* -------- แดชบอร์ดรายด้าน (iframe) -------- */
+  /* -------- แดชบอร์ดรายด้าน (iframe + KPI strip) -------- */
   const s = document.createElement('div'); s.className='slide';
-  s.innerHTML = `<div class="p-loading"><div class="spin"></div><div>กำลังโหลดแดชบอร์ด…</div></div>`;
+  const rec = OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no) : null;
+  const hasData = rec && rec.hasData && rec.value>0;
+  const md = MAP_DATA && MAP_DATA.map && MAP_DATA.map[d.no];
+  let topAmp='';
+  if(md){ const arr=Object.keys(md).map(a=>({a,v:md[a].main||0})).sort((x,y)=>y.v-x.v); if(arr.length&&arr[0].v>0) topAmp=arr[0].a; }
+  const stTxt = rec? (rec.status==='ok'?['ปกติ','var(--ok)']:rec.status==='warn'?['เฝ้าระวัง','var(--warn)']:['เร่งด่วน','var(--danger)']) : ['—','var(--ink-dim)'];
+
+  s.innerHTML = `
+    <div class="kpi-strip" style="--ac:${d.hex}">
+      <div class="kpi-ic">${d.icon}</div>
+      <div class="kpi-main">
+        <div class="kpi-metric">${rec? rec.metric : d.short}</div>
+        <div class="kpi-num">${hasData? rec.value.toLocaleString('th-TH') : '<span class="kpi-wait">รอข้อมูล</span>'}<span class="kpi-unit">${hasData? rec.unit : ''}</span></div>
+      </div>
+      ${topAmp? `<div class="kpi-box"><div class="kpi-box-l">พื้นที่สูงสุด</div><div class="kpi-box-v">${topAmp}</div></div>`:''}
+      <div class="kpi-box"><div class="kpi-box-l">ดัชนีด้าน</div><div class="kpi-box-v" style="color:${stTxt[1]}">${rec? rec.index : '—'}</div></div>
+      <div class="kpi-status" style="background:${stTxt[1]}">${stTxt[0]}</div>
+    </div>
+    <div class="p-loading"><div class="spin"></div><div>กำลังโหลดแดชบอร์ด…</div></div>`;
   const fr = document.createElement('iframe');
   fr.title = d.title; fr.src = d.url;
   fr.addEventListener('load', ()=> s.querySelector('.p-loading')?.classList.add('hide'));
@@ -1347,7 +1409,7 @@ function toggleVoice(){
   voiceOn = !voiceOn;
   const b=document.getElementById('pVoice');
   if(voiceOn){ b.classList.add('on'); b.innerHTML='🔊 เสียง AI'; if(present.classList.contains('open')) narrateSlide(cur); }
-  else { b.classList.remove('on'); b.classList.remove('speaking'); b.innerHTML='🔇 เสียง AI'; stopSpeak(); }
+  else { b.classList.remove('on'); b.classList.remove('speaking'); b.innerHTML='🔇 เสียง AI'; stopSpeak(); document.getElementById('pSubtitle')?.classList.remove('show'); }
 }
 function stopSpeak(){ if('speechSynthesis' in window) speechSynthesis.cancel(); }
 
@@ -1366,24 +1428,38 @@ function speak(text){
   if(buf) chunks.push(buf);
 
   let i=0;
+  const subBar=document.getElementById('pSubtitle');
+  const subTxt=document.getElementById('pSubText');
   const next=()=>{
-    if(myToken!==narrateToken || i>=chunks.length){ document.getElementById('pVoice')?.classList.remove('speaking'); return; }
+    if(myToken!==narrateToken || i>=chunks.length){
+      document.getElementById('pVoice')?.classList.remove('speaking');
+      if(subBar) subBar.classList.remove('show');
+      return;
+    }
     const u=new SpeechSynthesisUtterance(chunks[i]);
     u.lang='th-TH'; if(thaiVoice) u.voice=thaiVoice;
-    u.rate=0.94; u.pitch=1.0; u.volume=1.0;
-    u.onstart=()=>{ if(voiceOn) document.getElementById('pVoice')?.classList.add('speaking'); };
+    u.rate=1.05; u.pitch=1.02; u.volume=1.0;
+    u.onstart=()=>{
+      if(voiceOn){
+        document.getElementById('pVoice')?.classList.add('speaking');
+        if(subBar && subTxt){ subTxt.innerHTML=highlightNums(chunks[i]); subBar.classList.add('show'); }
+      }
+    };
     u.onend=()=>{ i++; next(); };
     u.onerror=()=>{ i++; next(); };
     speechSynthesis.speak(u);
   };
   next();
 }
+/* ไฮไลต์ตัวเลขใน subtitle ให้เด่น */
+function highlightNums(s){
+  return s.replace(/([\d,]+(?:\.\d+)?)/g,'<b>$1</b>');
+}
 
 /* สร้างบท "สิ่งสำคัญ" ของแต่ละสไลด์จากข้อมูลจริง (โทนทางการ กระชับ) */
 function narrationText(i){
   if(i===0){
-    return 'ขอต้อนรับสู่ศูนย์บัญชาการข้อมูลความมั่นคง จังหวัดหนองบัวลำภู ระบบนี้บูรณาการเชื่อมโยงฐานข้อมูลด้านความมั่นคงของจังหวัดไว้ในที่เดียว ครอบคลุมทั้งเก้าด้าน '+
-           'เพื่อให้ผู้บริหารเห็นภาพสถานการณ์ได้อย่างรอบด้าน และใช้ประกอบการตัดสินใจได้ทันท่วงที ต่อไปนี้จะนำเสนอรายละเอียดในแต่ละด้านตามลำดับ';
+    return 'ศูนย์บัญชาการข้อมูลความมั่นคง จังหวัดหนองบัวลำภู รวมข้อมูลความมั่นคงทั้งเก้าด้านไว้ในระบบเดียว เริ่มการนำเสนอ';
   }
   const d=DOMAINS[i-1];
 
@@ -1393,37 +1469,28 @@ function narrationText(i){
     const nOk=ov.domains.filter(o=>o.status==='ok').length;
     const nWarn=ov.domains.filter(o=>o.status==='warn').length;
     const nDanger=ov.domains.filter(o=>o.status==='danger').length;
-    const st = idx>=80?'ถือว่าอยู่ในเกณฑ์ปกติ':idx>=60?'อยู่ในระดับที่ต้องเฝ้าระวัง':'อยู่ในระดับที่ต้องเร่งดำเนินการ';
-    let t=`ในภาพรวม สถานการณ์ความมั่นคงของจังหวัดหนองบัวลำภู มีดัชนีความมั่นคงรวมอยู่ที่ ${idx} คะแนน จากคะแนนเต็มหนึ่งร้อย ซึ่ง${st} `;
-    if(nDanger>0) t+=`จากทั้งหมดแปดด้าน พบว่ามี ${nOk} ด้านที่อยู่ในเกณฑ์ปกติ อีก ${nWarn} ด้านที่ต้องเฝ้าระวัง และมี ${nDanger} ด้านที่ต้องเร่งดำเนินการเป็นการเฉพาะ `;
-    else t+=`จากทั้งหมดแปดด้าน มี ${nOk} ด้านที่อยู่ในเกณฑ์ปกติ และอีก ${nWarn} ด้านที่ยังต้องเฝ้าระวังอย่างต่อเนื่อง `;
     const worst=[...ov.domains].sort((a,b)=>a.index-b.index)[0];
-    if(worst) t+=`ทั้งนี้ ด้านที่ควรให้ความสำคัญเป็นลำดับแรก คือด้าน${DOMAINS[worst.no-1].short} ซึ่งมีดัชนีต่ำที่สุดในขณะนี้ และควรได้รับการติดตามอย่างใกล้ชิด`;
+    let t=`ภาพรวม ดัชนีความมั่นคงรวม ${idx} คะแนน `;
+    if(nDanger>0) t+=`ปกติ ${nOk} ด้าน เฝ้าระวัง ${nWarn} ด้าน เร่งด่วน ${nDanger} ด้าน `;
+    else t+=`ปกติ ${nOk} ด้าน เฝ้าระวัง ${nWarn} ด้าน `;
+    if(worst) t+=`ด้านที่ต้องจับตาที่สุด คือ${DOMAINS[worst.no-1].short}`;
     return t;
   }
 
   const rec = OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no) : null;
-  const ordTH=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด'];
-  /* เปิดด้วยบริบทของด้าน (ธรรมชาติกว่าอ่านชื่อหัวข้อ) */
-  let t=`ด้านที่ ${ordTH[d.no]||d.no} ${d.title} `;
-  if(d.brief) t+= d.brief+' ';
-
+  /* สั้น กระชับ ตัวเลขนำ */
   if(rec && rec.hasData && rec.value>0){
-    t+=`สำหรับผลการดำเนินงานสะสมในปีงบประมาณนี้ ${rec.metric} มีจำนวนรวมทั้งสิ้น ${rec.value.toLocaleString('th-TH')} ${rec.unit} `;
+    let t=`ด้าน${d.short} ${rec.metric} ${rec.value.toLocaleString('th-TH')} ${rec.unit} `;
     const md = MAP_DATA && MAP_DATA.map && MAP_DATA.map[d.no];
     if(md){
       const arr=Object.keys(md).map(a=>({a,v:md[a].main||0})).sort((x,y)=>y.v-x.v);
-      if(arr.length && arr[0].v>0){
-        t+=`โดยพื้นที่ที่มีตัวเลขสูงที่สุด คืออำเภอ${arr[0].a} `;
-        if(arr.length>1 && arr[1].v>0) t+=`รองลงมาคืออำเภอ${arr[1].a} ซึ่งเป็นพื้นที่ที่ควรให้ความสำคัญเป็นพิเศษ `;
-      }
+      if(arr.length && arr[0].v>0) t+=`สูงสุดที่อำเภอ${arr[0].a} `;
     }
-    const stTxt = rec.status==='ok'?'โดยรวมสถานการณ์อยู่ในเกณฑ์ปกติ':rec.status==='warn'?'ซึ่งประเมินแล้วยังอยู่ในระดับที่ต้องเฝ้าระวัง':'ซึ่งประเมินแล้วเป็นด้านที่ต้องเร่งดำเนินการ';
+    const stTxt = rec.status==='ok'?'สถานะปกติ':rec.status==='warn'?'ต้องเฝ้าระวัง':'ต้องเร่งดำเนินการ';
     t+=stTxt;
-  } else {
-    t+=`สำหรับข้อมูลผลการดำเนินงาน ขณะนี้อยู่ระหว่างการปรับปรุงให้เป็นปัจจุบัน โดยหน่วยงานที่รับผิดชอบ เมื่อมีการบันทึกข้อมูลครบถ้วนแล้ว ระบบจะแสดงตัวเลขและระบายสีเชิงพื้นที่ให้โดยอัตโนมัติ`;
+    return t;
   }
-  return t;
+  return `ด้าน${d.short} อยู่ระหว่างการปรับปรุงข้อมูลให้เป็นปัจจุบัน`;
 }
 
 function narrateSlide(i){
@@ -1431,6 +1498,11 @@ function narrateSlide(i){
   if(!voiceOn) return;
   const myToken=++narrateToken;
   setTimeout(()=>{ if(myToken===narrateToken && present.classList.contains('open')) speak(narrationText(i)); }, 550);
+}
+function repeatNarration(){
+  if(!present.classList.contains('open')) return;
+  if(!voiceOn){ toggleVoice(); return; }  /* ถ้าปิดอยู่ กดซ้ำ = เปิดแล้วพูด */
+  speak(narrationText(cur));
 }
 
 document.addEventListener('keydown', e=>{
@@ -1445,6 +1517,7 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='Escape') closePresent();
   else if(e.key==='a'||e.key==='A') toggleAuto();
   else if(e.key==='v'||e.key==='V') toggleVoice();
+  else if(e.key==='r'||e.key==='R') repeatNarration();
   else if(/^[1-9]$/.test(e.key)) gotoSlide(+e.key);
   else if(e.key==='0') gotoSlide(0);
 });

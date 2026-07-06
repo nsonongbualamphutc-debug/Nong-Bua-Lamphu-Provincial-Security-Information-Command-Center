@@ -626,7 +626,7 @@ footer b{color:var(--gold-bright);font-weight:600}
     <div class="p-title" id="pTitle">—<small id="pAgency"></small></div>
     <div class="dots" id="pDots"></div>
     <div class="p-nav">
-      <button class="btn on" id="pVoice" onclick="toggleVoice()" title="เปิด/ปิดเสียงบรรยาย (V)">🔊 เสียง AI</button>
+      <button class="btn" id="pVoice" onclick="toggleVoice()" title="เปิด/ปิดเสียงบรรยาย (V)">🔇 เสียง AI</button>
       <button class="btn" id="pAuto" onclick="toggleAuto()" title="เล่นอัตโนมัติ (A)">⏵ อัตโนมัติ</button>
       <button class="btn" onclick="stepSlide(-1)" title="ก่อนหน้า (←)">◀</button>
       <button class="btn" onclick="stepSlide(1)" title="ถัดไป (→)">▶</button>
@@ -654,41 +654,49 @@ const NBL_GEO={"type":"FeatureCollection","features":[{"type":"Feature","propert
 const DOMAINS = [
   {no:1, icon:"💊", hex:"#FF6B6B",
    title:"การป้องกันและแก้ไขปัญหายาเสพติด", short:"ยาเสพติด",
+   brief:"ยาเสพติดเป็นปัญหาความมั่นคงลำดับต้นของจังหวัด การดำเนินงานมุ่งทั้งการปราบปรามผู้ค้าและการนำผู้เสพเข้าสู่กระบวนการบำบัดฟื้นฟูโดยชุมชนมีส่วนร่วม เพื่อคืนคนคุณภาพสู่สังคม",
    agency:"หน่วยงานหลัก: ที่ทำการปกครองจังหวัดหนองบัวลำภู",
    points:["X-Ray พื้นที่เสี่ยงและกลุ่มเป้าหมาย","บำบัดฟื้นฟูโดยชุมชน (CBTx)","หมู่บ้าน/ชุมชนเข้มแข็งปลอดยาเสพติด"],
    url:"https://nsonongbualamphutc-debug.github.io/Drug-situation-dashboard-Nong-Bua-Lamphu-Province/"},
   {no:2, icon:"🖥️", hex:"#4CC9F0",
    title:"อาชญากรรมทางเทคโนโลยี", short:"อาชญากรรมไซเบอร์",
+   brief:"อาชญากรรมทางเทคโนโลยีเป็นภัยคุกคามรูปแบบใหม่ที่ขยายตัวรวดเร็ว สร้างความเสียหายทางทรัพย์สินแก่ประชาชนในวงกว้าง การเชื่อมโยงข้อมูลระหว่างตำรวจ ฝ่ายปกครอง และสถาบันการเงิน จึงเป็นหัวใจสำคัญ",
    agency:"หน่วยงานหลัก: ตำรวจภูธรจังหวัดหนองบัวลำภู",
    points:["ฐานข้อมูลคดีไซเบอร์เป็นปัจจุบัน","เชื่อมข้อมูลตำรวจ–ปกครอง–สถาบันการเงิน","สร้างภูมิคุ้มกันภัยไซเบอร์แก่ประชาชน"],
    url:"https://nsonongbualamphutc-debug.github.io/Prevention_and_Suppression_of_Technology-Related_Crime/"},
   {no:3, icon:"⚖️", hex:"#B388EB",
    title:"การป้องกันและปราบปรามผู้มีอิทธิพล", short:"ผู้มีอิทธิพล",
+   brief:"การควบคุมผู้มีอิทธิพลในพื้นที่เป็นรากฐานของการรักษาความสงบเรียบร้อย การจัดทำฐานข้อมูลบุคคลและเครือข่ายอย่างเป็นระบบ ช่วยให้การเฝ้าระวังและบังคับใช้กฎหมายเป็นไปอย่างมีประสิทธิภาพ",
    agency:"หน่วยงานหลัก: ตำรวจภูธรจังหวัดหนองบัวลำภู",
    points:["ฐานข้อมูลบุคคล/เครือข่ายผู้มีอิทธิพล","บูรณาการข่าวสารและเบาะแสทุกภาคส่วน","บังคับใช้กฎหมายและขยายผลเครือข่าย"],
    url:"https://nsonongbualamphutc-debug.github.io/Operations_to_Prevent_and_Suppress_Influential_Figures/"},
   {no:4, icon:"💰", hex:"#FFB703",
    title:"การป้องกันและปราบปรามการฟอกเงิน", short:"ฟอกเงิน (AML)",
+   brief:"การติดตามเส้นทางการเงินและการยึดอายัดทรัพย์สิน เป็นมาตรการตัดวงจรอาชญากรรมที่ได้ผลที่สุด เพราะกระทบต่อผลประโยชน์ของผู้กระทำผิดโดยตรง",
    agency:"หน่วยงานหลัก: ตำรวจภูธรจังหวัดหนองบัวลำภู",
    points:["ฐานข้อมูลคดีและธุรกรรมเสี่ยง","วิเคราะห์เส้นทางการเงินผิดกฎหมาย","ยึด อายัด และติดตามทรัพย์สิน"],
    url:"https://nsonongbualamphutc-debug.github.io/Anti-Money_Laundering_Operations/"},
   {no:5, icon:"🌳", hex:"#57CC99",
    title:"การบุกรุกที่ดินสาธารณประโยชน์และพื้นที่ป่า", short:"ที่ดิน–ป่าไม้",
+   brief:"การบุกรุกที่ดินสาธารณะและพื้นที่ป่า ส่งผลต่อทรัพยากรธรรมชาติและสิทธิของประชาชนส่วนรวม การทวงคืนและฟื้นฟูพื้นที่ จึงเป็นการรักษาสมบัติของแผ่นดินให้คงอยู่",
    agency:"หน่วยงานหลัก: ที่ทำการปกครองจังหวัดฯ · ศูนย์ป่าไม้ที่ 6",
    points:["ฐานข้อมูลพื้นที่เสี่ยง/ร้องเรียน","ติดตามการใช้ที่ดินด้วยเทคโนโลยี","บังคับใช้กฎหมายและฟื้นฟูพื้นที่"],
    url:"https://nsonongbualamphutc-debug.github.io/Operations_to_address_the_problem_of_encroachment_on_public_land_and_forest_areas/"},
   {no:6, icon:"🤝", hex:"#FF922B",
    title:"การแก้ไขปัญหาหนี้นอกระบบ", short:"หนี้นอกระบบ",
+   brief:"หนี้นอกระบบเป็นปัญหาที่กัดกร่อนคุณภาพชีวิตประชาชนในระดับฐานราก การไกล่เกลี่ยและช่วยเหลือลูกหนี้ให้เข้าถึงแหล่งเงินทุนในระบบ เป็นการแก้ปัญหาที่ต้นเหตุอย่างยั่งยืน",
    agency:"หน่วยงานหลัก: ที่ทำการปกครองจังหวัดฯ และอำเภอทุกอำเภอ",
    points:["ฐานข้อมูลลูกหนี้–เจ้าหนี้นอกระบบ","ไกล่เกลี่ยและช่วยเหลือลูกหนี้","ส่งเสริมเข้าถึงแหล่งเงินทุนในระบบ"],
    url:"https://nsonongbualamphutc-debug.github.io/Operations_To_Resolve_The_Problem_Of_Informal_Debt/"},
   {no:7, icon:"🕵️", hex:"#FF5D8F",
    title:"ธุรกิจที่ใช้คนไทยเป็นตัวแทนแบบอำพราง", short:"ธุรกิจอำพราง (นอมินี)",
+   brief:"ธุรกิจที่ใช้คนไทยเป็นตัวแทนอำพราง กระทบต่อความมั่นคงทางเศรษฐกิจและการแข่งขันที่เป็นธรรม การตรวจสอบโครงสร้างผู้ถือหุ้นและแหล่งเงินทุนอย่างเข้มงวด จึงมีความจำเป็น",
    agency:"หน่วยงานหลัก: สำนักงานพาณิชย์จังหวัดหนองบัวลำภู",
    points:["ฐานข้อมูลนิติบุคคลที่เข้าข่าย","ตรวจสอบผู้ถือหุ้น–แหล่งเงินทุน","บูรณาการพาณิชย์–สรรพากร บังคับใช้กฎหมาย"],
    url:"https://nsonongbualamphutc-debug.github.io/Address_the_issue_of_businesses_that_use_Thai_nationals_as_proxies_to_disguise_their_activities/"},
   {no:8, icon:"🧳", hex:"#38B6FF",
    title:"การเสริมสร้างความปลอดภัยนักท่องเที่ยว", short:"ความปลอดภัยนักท่องเที่ยว",
+   brief:"ความปลอดภัยของนักท่องเที่ยวเป็นภาพลักษณ์สำคัญของจังหวัด การเชื่อมโยงข้อมูลและระบบแจ้งเตือนเหตุ ช่วยสร้างความเชื่อมั่นและส่งเสริมเศรษฐกิจการท่องเที่ยว",
    agency:"หน่วยงานหลัก: ที่ทำการปกครองจังหวัดหนองบัวลำภู",
    points:["ฐานข้อมูลแหล่งท่องเที่ยว/ที่พัก","ระบบประเมินความเสี่ยงและแจ้งเตือนเหตุ","สร้างความเชื่อมั่นด้านการท่องเที่ยว"],
    url:"https://nsonongbualamphutc-debug.github.io/Enhance_The_Safety_Of_Tourists/index.html"},
@@ -1321,7 +1329,7 @@ function exportPDF(){
 }
 
 /* ================= AI VOICE NARRATION ================= */
-let voiceOn = true;
+let voiceOn = false;   /* ค่าเริ่มต้น: ปิดเสียง — กดเปิดเองเมื่ออยากฟัง */
 let thaiVoice = null;
 let narrateToken = 0;
 
@@ -1339,7 +1347,7 @@ function toggleVoice(){
   voiceOn = !voiceOn;
   const b=document.getElementById('pVoice');
   if(voiceOn){ b.classList.add('on'); b.innerHTML='🔊 เสียง AI'; if(present.classList.contains('open')) narrateSlide(cur); }
-  else { b.classList.remove('on'); b.innerHTML='🔇 ปิดเสียง'; stopSpeak(); }
+  else { b.classList.remove('on'); b.classList.remove('speaking'); b.innerHTML='🔇 เสียง AI'; stopSpeak(); }
 }
 function stopSpeak(){ if('speechSynthesis' in window) speechSynthesis.cancel(); }
 
@@ -1347,13 +1355,22 @@ function speak(text){
   if(!voiceOn || !('speechSynthesis' in window) || !text) return;
   speechSynthesis.cancel();
   const myToken = ++narrateToken;
-  const chunks = text.match(/[^。.!?\n]+[。.!?\n]?/g) || [text];
+  /* แบ่งเป็นท่อน ~150 ตัวอักษร ตัดที่ช่องว่างใกล้ที่สุด
+     ท่อนสั้นเกินเสียงจะสะดุด ยาวเกิน Chrome อาจตัดเสียงกลางคัน */
+  const words = text.replace(/\s+/g,' ').trim().split(' ');
+  const chunks=[]; let buf='';
+  words.forEach(w=>{
+    if((buf+' '+w).length>150 && buf){ chunks.push(buf); buf=w; }
+    else buf = buf? buf+' '+w : w;
+  });
+  if(buf) chunks.push(buf);
+
   let i=0;
   const next=()=>{
     if(myToken!==narrateToken || i>=chunks.length){ document.getElementById('pVoice')?.classList.remove('speaking'); return; }
-    const u=new SpeechSynthesisUtterance(chunks[i].trim());
+    const u=new SpeechSynthesisUtterance(chunks[i]);
     u.lang='th-TH'; if(thaiVoice) u.voice=thaiVoice;
-    u.rate=1.0; u.pitch=1.0; u.volume=1.0;
+    u.rate=0.94; u.pitch=1.0; u.volume=1.0;
     u.onstart=()=>{ if(voiceOn) document.getElementById('pVoice')?.classList.add('speaking'); };
     u.onend=()=>{ i++; next(); };
     u.onerror=()=>{ i++; next(); };
@@ -1365,38 +1382,46 @@ function speak(text){
 /* สร้างบท "สิ่งสำคัญ" ของแต่ละสไลด์จากข้อมูลจริง (โทนทางการ กระชับ) */
 function narrationText(i){
   if(i===0){
-    return 'ยินดีต้อนรับสู่ศูนย์บัญชาการข้อมูลความมั่นคง จังหวัดหนองบัวลำภู. '+
-           'ระบบบูรณาการเชื่อมโยงฐานข้อมูลด้านความมั่นคง จำนวน 9 ด้าน เพื่อสนับสนุนการตัดสินใจของผู้บริหาร. '+
-           'เริ่มการนำเสนอรายด้าน.';
+    return 'ขอต้อนรับสู่ศูนย์บัญชาการข้อมูลความมั่นคง จังหวัดหนองบัวลำภู ระบบนี้บูรณาการเชื่อมโยงฐานข้อมูลด้านความมั่นคงของจังหวัดไว้ในที่เดียว ครอบคลุมทั้งเก้าด้าน '+
+           'เพื่อให้ผู้บริหารเห็นภาพสถานการณ์ได้อย่างรอบด้าน และใช้ประกอบการตัดสินใจได้ทันท่วงที ต่อไปนี้จะนำเสนอรายละเอียดในแต่ละด้านตามลำดับ';
   }
   const d=DOMAINS[i-1];
+
   if(d.overview){
     const ov=OVERVIEW;
     const idx=Math.round(ov.domains.reduce((a,o)=>a+o.index,0)/ov.domains.length);
     const nOk=ov.domains.filter(o=>o.status==='ok').length;
     const nWarn=ov.domains.filter(o=>o.status==='warn').length;
     const nDanger=ov.domains.filter(o=>o.status==='danger').length;
-    const st = idx>=80?'อยู่ในเกณฑ์ปกติ':idx>=60?'อยู่ในระดับเฝ้าระวัง':'อยู่ในระดับที่ต้องเร่งดำเนินการ';
-    let t=`ภาพรวมความมั่นคงของจังหวัด. ดัชนีความมั่นคงรวมอยู่ที่ ${idx} คะแนน จากคะแนนเต็มหนึ่งร้อยคะแนน ซึ่ง${st}. `;
-    t+=`จำแนกเป็น สถานะปกติ ${nOk} ด้าน เฝ้าระวัง ${nWarn} ด้าน`;
-    t+= nDanger>0? ` และต้องเร่งดำเนินการ ${nDanger} ด้าน. `:'. ';
+    const st = idx>=80?'ถือว่าอยู่ในเกณฑ์ปกติ':idx>=60?'อยู่ในระดับที่ต้องเฝ้าระวัง':'อยู่ในระดับที่ต้องเร่งดำเนินการ';
+    let t=`ในภาพรวม สถานการณ์ความมั่นคงของจังหวัดหนองบัวลำภู มีดัชนีความมั่นคงรวมอยู่ที่ ${idx} คะแนน จากคะแนนเต็มหนึ่งร้อย ซึ่ง${st} `;
+    if(nDanger>0) t+=`จากทั้งหมดแปดด้าน พบว่ามี ${nOk} ด้านที่อยู่ในเกณฑ์ปกติ อีก ${nWarn} ด้านที่ต้องเฝ้าระวัง และมี ${nDanger} ด้านที่ต้องเร่งดำเนินการเป็นการเฉพาะ `;
+    else t+=`จากทั้งหมดแปดด้าน มี ${nOk} ด้านที่อยู่ในเกณฑ์ปกติ และอีก ${nWarn} ด้านที่ยังต้องเฝ้าระวังอย่างต่อเนื่อง `;
     const worst=[...ov.domains].sort((a,b)=>a.index-b.index)[0];
-    if(worst) t+=`ด้านที่ควรให้ความสำคัญเป็นลำดับต้น คือ ${DOMAINS[worst.no-1].short}. `;
+    if(worst) t+=`ทั้งนี้ ด้านที่ควรให้ความสำคัญเป็นลำดับแรก คือด้าน${DOMAINS[worst.no-1].short} ซึ่งมีดัชนีต่ำที่สุดในขณะนี้ และควรได้รับการติดตามอย่างใกล้ชิด`;
     return t;
   }
+
   const rec = OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no) : null;
-  let t=`ด้านที่ ${d.no}. ${d.title}. `;
+  const ordTH=['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด'];
+  /* เปิดด้วยบริบทของด้าน (ธรรมชาติกว่าอ่านชื่อหัวข้อ) */
+  let t=`ด้านที่ ${ordTH[d.no]||d.no} ${d.title} `;
+  if(d.brief) t+= d.brief+' ';
+
   if(rec && rec.hasData && rec.value>0){
-    t+=`${rec.metric} รวมทั้งสิ้น ${rec.value.toLocaleString('th-TH')} ${rec.unit}. `;
+    t+=`สำหรับผลการดำเนินงานสะสมในปีงบประมาณนี้ ${rec.metric} มีจำนวนรวมทั้งสิ้น ${rec.value.toLocaleString('th-TH')} ${rec.unit} `;
     const md = MAP_DATA && MAP_DATA.map && MAP_DATA.map[d.no];
     if(md){
       const arr=Object.keys(md).map(a=>({a,v:md[a].main||0})).sort((x,y)=>y.v-x.v);
-      if(arr.length && arr[0].v>0) t+=`โดยอำเภอ${arr[0].a}มีจำนวนสูงสุด. `;
+      if(arr.length && arr[0].v>0){
+        t+=`โดยพื้นที่ที่มีตัวเลขสูงที่สุด คืออำเภอ${arr[0].a} `;
+        if(arr.length>1 && arr[1].v>0) t+=`รองลงมาคืออำเภอ${arr[1].a} ซึ่งเป็นพื้นที่ที่ควรให้ความสำคัญเป็นพิเศษ `;
+      }
     }
-    const stTxt = rec.status==='ok'?'สถานการณ์อยู่ในเกณฑ์ปกติ':rec.status==='warn'?'อยู่ในระดับเฝ้าระวัง':'ต้องเร่งดำเนินการ';
-    t+=`ประเมินสถานะโดยรวม ${stTxt}. `;
+    const stTxt = rec.status==='ok'?'โดยรวมสถานการณ์อยู่ในเกณฑ์ปกติ':rec.status==='warn'?'ซึ่งประเมินแล้วยังอยู่ในระดับที่ต้องเฝ้าระวัง':'ซึ่งประเมินแล้วเป็นด้านที่ต้องเร่งดำเนินการ';
+    t+=stTxt;
   } else {
-    t+=`ขณะนี้อยู่ระหว่างการปรับปรุงข้อมูลให้เป็นปัจจุบันจากหน่วยงานที่รับผิดชอบ. `;
+    t+=`สำหรับข้อมูลผลการดำเนินงาน ขณะนี้อยู่ระหว่างการปรับปรุงให้เป็นปัจจุบัน โดยหน่วยงานที่รับผิดชอบ เมื่อมีการบันทึกข้อมูลครบถ้วนแล้ว ระบบจะแสดงตัวเลขและระบายสีเชิงพื้นที่ให้โดยอัตโนมัติ`;
   }
   return t;
 }

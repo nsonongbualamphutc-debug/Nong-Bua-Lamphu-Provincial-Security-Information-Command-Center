@@ -512,6 +512,49 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .pill.ok{color:#0A2415;background:var(--ok)}
 .pill.warn{color:#2A1F00;background:var(--warn)}
 .pill.danger{color:#2A0505;background:var(--danger)}
+/* ----- Smart Alerts ----- */
+.alerts{display:flex;flex-direction:column;gap:8px}
+.alert-item{
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px 15px;
+  font-size:13.5px;line-height:1.6;color:var(--ink);transition:.2s;background:rgba(255,255,255,.02);
+  text-wrap:pretty;
+}
+.alert-item:hover{background:rgba(255,255,255,.05);transform:translateX(3px)}
+.alert-item span{font-size:17px;flex:none}
+.alert-item div{flex:1}
+.alert-item b{font-family:'Chakra Petch';color:var(--gold-bright)}
+.alert-item i{color:var(--ink-dim);font-style:normal;font-size:18px}
+.alert-item.warn{border-left:3px solid var(--warn)}
+.alert-item.danger{border-left:3px solid var(--danger)}
+.alert-item.info{border-left:3px solid var(--c2)}
+.alert-item.ok{border-left:3px solid var(--ok);cursor:default}
+/* ----- Forecast ----- */
+.fc-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.fc-chip{
+  --ac:var(--gold);
+  font-family:'Kanit';font-size:12.5px;color:var(--ink-dim);cursor:pointer;
+  border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:6px 13px;
+  background:rgba(255,255,255,.02);transition:.2s;
+}
+.fc-chip:hover{color:var(--ink);border-color:color-mix(in srgb,var(--ac) 45%, transparent)}
+.fc-chip.on{color:var(--ink);border-color:var(--ac);background:color-mix(in srgb,var(--ac) 15%, transparent)}
+.fc-note{
+  margin-top:12px;font-size:13.5px;color:var(--ink-dim);line-height:1.8;text-wrap:pretty;
+  border:1px dashed rgba(240,199,94,.3);border-radius:11px;padding:11px 15px;background:rgba(240,199,94,.04);
+}
+.fc-note b{font-family:'Chakra Petch';color:var(--gold-bright)}
+/* ----- LIVE badge ----- */
+.live-badge{
+  display:none;align-items:center;gap:6px;
+  font-family:'Chakra Petch';font-weight:700;font-size:11.5px;letter-spacing:1.5px;
+  color:var(--ok);border:1px solid rgba(61,220,132,.4);border-radius:99px;padding:4px 12px;
+  background:rgba(61,220,132,.07);
+}
+.live-badge.on{display:inline-flex}
+.live-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.4s infinite}
+.live-time{font-size:10.5px;color:var(--ink-dim);letter-spacing:.5px;font-weight:400}
+
 /* ----- Execution tracking (หน้าหลัก) ----- */
 .drive-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
 @media(max-width:900px){.drive-grid{grid-template-columns:1fr}}
@@ -627,6 +670,7 @@ footer b{color:var(--gold-bright);font-weight:600}
     <div class="t2 mono">NONG BUA LAM PHU · SECURITY DATA COMMAND CENTER · FY 2569</div>
   </div>
   <div class="spacer"></div>
+  <span class="live-badge" id="liveBadge">LIVE <span class="live-time" id="liveTime"></span></span>
   <div class="clock" id="clock">--:--:--</div>
   <button class="btn" onclick="toggleFS()" title="เต็มจอ (F)">⛶ เต็มจอ</button>
   <button class="btn primary" onclick="openPresent(-1)">▶ เริ่มนำเสนอ</button>
@@ -722,6 +766,10 @@ footer b{color:var(--gold-bright);font-weight:600}
         <div class="ready-bar"><i id="readyBar" style="width:0%"></i></div>
         <div class="ready-note" id="readyNote">กำลังตรวจสอบสถานะการรายงาน…</div>
       </div>
+    </div>
+    <div class="plan-card" style="grid-column:1/-1">
+      <h3><span>🔔</span>ประเด็นที่ระบบตรวจพบอัตโนมัติ</h3>
+      <div class="alerts" id="homeAlerts"></div>
     </div>
   </div>
 </section>
@@ -1141,6 +1189,17 @@ function renderOverview(){
           }).join('')}
         </div>
       </div>
+      <div class="ov-panel" style="grid-column:1/-1">
+        <h4>🔔 ประเด็นที่ระบบตรวจพบ <span class="tag2">SMART ALERTS</span></h4>
+        <div class="alerts" id="ovAlerts"></div>
+      </div>
+      <div class="ov-panel" style="grid-column:1/-1">
+        <h4>🔮 แนวโน้มและการคาดการณ์ <span class="tag2">TREND & FORECAST</span> <span style="flex:1"></span>
+          <span style="font-size:11.5px;color:var(--ink-dim);font-weight:400">เส้นประ = คาดการณ์ 4 งวดข้างหน้า จากแนวโน้มปัจจุบัน</span></h4>
+        <div class="fc-chips" id="fcChips"></div>
+        <div class="chart-box" style="height:280px"><canvas id="fcChart"></canvas></div>
+        <div class="fc-note" id="fcNote"></div>
+      </div>
       <div class="ov-note">
         ${ov.demo? '<span class="demo">⚠ ข้อมูลตัวอย่างเพื่อการออกแบบ</span> · เมื่อเชื่อมชีตสรุปกลางผ่าน Google Apps Script ตัวเลขจะอัปเดตอัตโนมัติตามการบันทึกข้อมูลของแต่ละแดชบอร์ด' : 'อัปเดตล่าสุด: '+ov.updated}
         &nbsp;·&nbsp; แหล่งข้อมูล: ฐานข้อมูลความมั่นคง 8 ด้าน จังหวัดหนองบัวลำภู
@@ -1149,6 +1208,10 @@ function renderOverview(){
   pBody.appendChild(s);
 
   drawGauge(document.getElementById('ovGauge'), idx);
+  renderAlerts('ovAlerts');
+  buildFcChips();
+  renderForecast(fcDomain);
+  if(!TREND_DATA) loadTrendData();
   animateNum(document.getElementById('ovIdx'), idx);
 
   if(barChart){barChart.destroy();barChart=null}
@@ -1360,15 +1423,29 @@ function refreshDrive(){
   }
 }
 
+let lastSync=0;
 window.handleOverview = function(data){
   try{
     if(data && Array.isArray(data.domains) && data.domains.length){
       OVERVIEW = {updated: data.updated||'', demo:false, domains: data.domains};
+      lastSync=Date.now();
+      document.getElementById('liveBadge')?.classList.add('on');
       buildTicker();
       refreshDrive();
+      renderAlerts('homeAlerts');
+      if(document.getElementById('ovAlerts')) renderAlerts('ovAlerts');
     }
   }catch(e){console.warn('overview parse error',e)}
 };
+/* เวลาสัมพัทธ์ "อัปเดต x นาทีที่แล้ว" */
+setInterval(()=>{
+  const el=document.getElementById('liveTime');
+  if(!el||!lastSync) return;
+  const m=Math.floor((Date.now()-lastSync)/60000);
+  el.textContent = m<1? 'เมื่อสักครู่' : 'อัปเดต '+m+' นาทีที่แล้ว';
+},15000);
+/* รีเฟรชข้อมูลอัตโนมัติทุก 5 นาที */
+setInterval(()=>{ loadOverview(); MAP_DATA=null; loadMapData(); TREND_DATA=null; },300000);
 function loadOverview(){
   if(!OVERVIEW_API) return;
   const sc=document.createElement('script');
@@ -1384,6 +1461,108 @@ const AMP_COLORS={'เมืองหนองบัวลำภู':'#F0C75E','
 const MAP_CENTER=[17.225,102.332], MAP_ZOOM=9;
 
 /* โหลดข้อมูลแผนที่รายอำเภอ (JSONP) */
+/* -------- Forecast: กราฟแนวโน้ม + คาดการณ์เชิงเส้น -------- */
+let fcDomain=1, fcChart=null;
+function buildFcChips(){
+  const box=document.getElementById('fcChips');
+  if(!box) return;
+  box.innerHTML=DOMAINS.filter(d=>!d.overview).map(d=>
+    `<button class="fc-chip ${d.no===fcDomain?'on':''}" style="--ac:${d.hex}" onclick="fcDomain=${d.no};renderForecast(${d.no});buildFcChips()">${d.icon} ${d.short}</button>`).join('');
+}
+function linReg(ys){
+  const n=ys.length; if(n<2) return null;
+  let sx=0,sy=0,sxy=0,sxx=0;
+  ys.forEach((y,x)=>{sx+=x;sy+=y;sxy+=x*y;sxx+=x*x});
+  const b=(n*sxy-sx*sy)/(n*sxx-sx*sx||1), a=(sy-b*sx)/n;
+  return {a,b};
+}
+function renderForecast(no){
+  const d=DOMAINS[no-1];
+  const note=document.getElementById('fcNote');
+  const pts=(TREND_DATA && TREND_DATA.series && TREND_DATA.series[no])||[];
+  if(fcChart){fcChart.destroy();fcChart=null}
+  const cv=document.getElementById('fcChart');
+  if(!cv) return;
+  if(!window.Chart){ note.innerHTML='ไม่สามารถโหลดไลบรารีกราฟได้'; return; }
+  if(pts.length<2){
+    note.innerHTML=`<span class="ai-wait">ด้าน${d.short}: ข้อมูลยังไม่พอสำหรับคาดการณ์ (ต้องมีอย่างน้อย 2 งวด) — เมื่อมีการรายงานต่อเนื่อง ระบบจะพยากรณ์ให้อัตโนมัติ</span>`;
+    const ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+    return;
+  }
+  const ys=pts.map(p=>p.v);
+  const reg=linReg(ys);
+  const FC=4;
+  const labels=pts.map(p=>p.label).concat(Array.from({length:FC},(_,k)=>'คาดการณ์ +'+(k+1)));
+  const actual=ys.concat(Array(FC).fill(null));
+  const forecast=Array(ys.length-1).fill(null)
+    .concat([ys[ys.length-1]])
+    .concat(Array.from({length:FC},(_,k)=>Math.max(0,Math.round((reg.a+reg.b*(ys.length+k))*100)/100)));
+  fcChart=new Chart(cv,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'ข้อมูลจริง',data:actual,borderColor:d.hex,backgroundColor:d.hex+'33',fill:true,tension:.35,pointRadius:4,pointBackgroundColor:d.hex},
+      {label:'คาดการณ์',data:forecast,borderColor:d.hex,borderDash:[7,6],pointStyle:'rectRot',pointRadius:4,pointBackgroundColor:'#F0C75E',fill:false,tension:.2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#C7D2EE',font:{family:'Kanit'}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#93A3C9',font:{family:'Kanit',size:11}}},
+        y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#93A3C9',font:{family:'Chakra Petch'}}}
+      }}
+  });
+  /* ข้อความ AI คาดการณ์ */
+  const last=ys[ys.length-1];
+  const fc4=forecast[forecast.length-1];
+  const dir=reg.b>0.01?'มีแนวโน้มเพิ่มขึ้น':reg.b<-0.01?'มีแนวโน้มลดลง':'ค่อนข้างคงที่';
+  const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===no):null;
+  const unit=rec? rec.unit:'';
+  note.innerHTML=`🤖 <b style="color:${d.hex}">${d.short}</b> ${dir}เฉลี่ยงวดละ <b>${Math.abs(Math.round(reg.b*10)/10).toLocaleString('th-TH')}</b> ${unit} — หากแนวโน้มคงเดิม อีก 4 งวดข้างหน้าคาดว่าจะอยู่ที่ประมาณ <b>${fc4.toLocaleString('th-TH')}</b> ${unit} (ปัจจุบัน ${last.toLocaleString('th-TH')} ${unit})`;
+}
+
+/* -------- Trend series (อนุกรมเวลา สำหรับคาดการณ์) -------- */
+let TREND_DATA=null;
+window.handleTrend = function(data){
+  if(data && data.series){ TREND_DATA=data; if(document.getElementById('fcChart')) renderForecast(fcDomain); }
+};
+function loadTrendData(){
+  if(!OVERVIEW_API) return;
+  const sc=document.createElement('script');
+  sc.src = OVERVIEW_API + (OVERVIEW_API.includes('?')?'&':'?') + 'mode=trend&callback=handleTrend&t=' + Date.now();
+  sc.onerror=()=>console.warn('trend api unreachable');
+  document.body.appendChild(sc);
+}
+
+/* -------- Smart Alerts: ระบบตรวจจับประเด็นอัตโนมัติ -------- */
+function buildAlerts(){
+  const out=[];
+  if(!OVERVIEW.domains || OVERVIEW.demo) return out;
+  const noData=OVERVIEW.domains.filter(o=>!o.hasData);
+  OVERVIEW.domains.forEach(o=>{
+    const d=DOMAINS[o.no-1];
+    if(o.hasData && Math.abs(o.trend)>=15)
+      out.push({lv: o.trend>0?'warn':'info', ic: o.trend>0?'📈':'📉', no:o.no,
+        txt:`ด้าน${d.short} ${o.trend>0?'เพิ่มขึ้น':'ลดลง'} <b>${Math.abs(o.trend)}%</b> จากงวดก่อน — ควรติดตามสาเหตุ`});
+    if(o.hasData && o.reported>0 && o.reported<6)
+      out.push({lv:'warn', ic:'📮', no:o.no,
+        txt:`ด้าน${d.short} รายงานงวดล่าสุดเพียง <b>${o.reported}/6</b> อำเภอ — ควรเร่งรัดพื้นที่ที่เหลือ`});
+    if(o.status==='danger')
+      out.push({lv:'danger', ic:'🚨', no:o.no,
+        txt:`ด้าน${d.short} ดัชนีต่ำกว่าเกณฑ์ (<b>${o.index}</b>/100) — ต้องเร่งดำเนินการ`});
+  });
+  if(noData.length>0)
+    out.push({lv:'info', ic:'⏳', no:noData[0].no,
+      txt:`มี <b>${noData.length}</b> ด้านยังไม่เริ่มรายงานข้อมูล: ${noData.map(o=>DOMAINS[o.no-1].short).slice(0,4).join(' · ')}${noData.length>4?' ฯลฯ':''}`});
+  return out.slice(0,5);
+}
+function renderAlerts(targetId){
+  const el=document.getElementById(targetId);
+  if(!el) return;
+  const alerts=buildAlerts();
+  if(!alerts.length){ el.innerHTML=OVERVIEW.demo? '<div class="alert-item info"><span>⏳</span><div>รอเชื่อมต่อข้อมูลจริง — ระบบจะตรวจจับประเด็นให้อัตโนมัติ</div></div>' : '<div class="alert-item ok"><span>✅</span><div>ไม่พบประเด็นผิดปกติ — สถานการณ์และการรายงานเป็นไปตามปกติ</div></div>'; return; }
+  el.innerHTML=alerts.map(a=>
+    `<div class="alert-item ${a.lv}" onclick="openPresent(${a.no-1})"><span>${a.ic}</span><div>${a.txt}</div><i>›</i></div>`).join('');
+}
+
 window.handleMap = function(data){
   if(data && data.map){ MAP_DATA=data; if(activeLayer && activeLayer!=='base') paintChoropleth(activeLayer); refreshAiSummary(); }
 };
@@ -1825,6 +2004,7 @@ document.querySelectorAll('[data-count]').forEach(el=>{
 document.querySelectorAll('[data-seal]').forEach(el=>el.src=SEAL);
 buildTicker();
 refreshDrive();
+renderAlerts('homeAlerts');
 loadOverview();
 loadMapData();
 initVoices();

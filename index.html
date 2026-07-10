@@ -918,10 +918,10 @@ const SAMPLE_OVERVIEW = {
     {no:2, metric:"มูลค่าความเสียหายไซเบอร์",   value:4.2,  unit:"ล้านบาท",  trend:-12, status:"warn",  index:64},
     {no:3, metric:"เป้าหมายเฝ้าระวังในพื้นที่",   value:27,   unit:"ราย",     trend:0,   status:"ok",    index:82},
     {no:4, metric:"ทรัพย์สินยึด/อายัด (ล่าสุด)",     value:18.5, unit:"ล้านบาท",  trend:15,  status:"ok",    index:78},
-    {no:5, metric:"พื้นที่ทวงคืน/ฟื้นฟู (ล่าสุด)",     value:1240, unit:"ไร่",      trend:6,   status:"ok",    index:75},
+    {no:5, metric:"ผลการลาดตระเวนสะสม",           value:18,   unit:"ครั้ง",     trend:6,   status:"ok",    index:75},
     {no:6, metric:"ไกล่เกลี่ยหนี้สำเร็จ (ล่าสุด)",     value:486,  unit:"ราย",     trend:11,  status:"ok",    index:80},
     {no:7, metric:"นิติบุคคลที่ตรวจสอบแล้ว",     value:45,   unit:"แห่ง",     trend:5,   status:"warn",  index:70},
-    {no:8, metric:"เหตุแจ้งนักท่องเที่ยว ปีงบ 69", value:12,   unit:"เหตุการณ์", trend:-25, status:"ok",    index:88}
+    {no:8, metric:"ผลการตรวจสะสม",                value:42,   unit:"ครั้ง",     trend:-25, status:"ok",    index:88}
   ]
 };
 let OVERVIEW = SAMPLE_OVERVIEW;
@@ -986,7 +986,9 @@ DOMAINS.forEach((d,i)=>{
 /* ================= TICKER ================= */
 function buildTicker(){
   const stClr = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)'};
-  const items = OVERVIEW.domains.map(o=>{
+  /* ด้านที่มีผลงาน (มีข้อมูล) ขึ้นก่อน */
+  const ordered = [...OVERVIEW.domains].sort((a,b)=>((b.hasData&&b.value>0)?1:0)-((a.hasData&&a.value>0)?1:0));
+  const items = ordered.map(o=>{
     const d = DOMAINS[o.no-1];
     return `<span class="tick-item" onclick="openPresent(${o.no-1})">
       <span class="st" style="background:${stClr[o.status]||'var(--ink-dim)'}"></span>

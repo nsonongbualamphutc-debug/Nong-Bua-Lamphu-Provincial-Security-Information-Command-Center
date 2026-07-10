@@ -512,6 +512,28 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .pill.ok{color:#0A2415;background:var(--ok)}
 .pill.warn{color:#2A1F00;background:var(--warn)}
 .pill.danger{color:#2A0505;background:var(--danger)}
+/* ----- AI สรุปสถานการณ์ ----- */
+.ai-sum{display:flex;flex-direction:column;gap:9px}
+.ai-line{
+  --ac:var(--gold);
+  display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.07);border-left:3px solid var(--ac);
+  border-radius:12px;padding:12px 16px;background:rgba(255,255,255,.02);
+  transition:.2s;
+}
+.ai-line:hover{background:rgba(255,255,255,.05);transform:translateX(3px)}
+.ai-ic{font-size:18px;flex:none;margin-top:1px}
+.ai-txt{font-size:14px;line-height:1.8;color:var(--ink);text-wrap:pretty}
+.ai-txt b{font-family:'Chakra Petch';font-weight:700;color:var(--gold-bright);font-size:15.5px}
+.ai-dot{color:var(--ac);margin:0 2px}
+.ai-wait{color:var(--ink-dim);font-style:normal}
+
+/* ----- การตัดบรรทัดภาษาไทยให้สวย ----- */
+.hero h1,.title-slide h2,.sec-head h2,.card h3,.plan-card h3{text-wrap:balance}
+.hero .lead,.sec-sub,.card .points li,.plan-card p,.plan-card li,
+.ov-mini .mh,.kpi-metric,.lt-tam,.p-title,.ts-sub,.ts-focus{text-wrap:pretty}
+.card .points li,.plan-card li{overflow-wrap:normal;word-break:normal}
+
 .ov-note{
   grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   font-size:12.5px;color:var(--ink-dim);border:1px dashed rgba(255,197,61,.4);
@@ -1026,6 +1048,11 @@ function renderOverview(){
           }).join('')}
         </div>
       </div>
+      <div class="ov-panel" style="grid-column:1/-1">
+        <h4>🧠 AI สรุปสถานการณ์รายด้าน <span class="tag2">AI SITUATION BRIEF</span> <span style="flex:1"></span>
+          <span style="font-size:11.5px;color:var(--ink-dim);font-weight:400">สรุปจากค่าล่าสุดของทุกอำเภอ อัปเดตอัตโนมัติ</span></h4>
+        <div class="ai-sum" id="aiSum">${buildAiSummaryHTML()}</div>
+      </div>
       <div class="ov-note">
         ${ov.demo? '<span class="demo">⚠ ข้อมูลตัวอย่างเพื่อการออกแบบ</span> · เมื่อเชื่อมชีตสรุปกลางผ่าน Google Apps Script ตัวเลขจะอัปเดตอัตโนมัติตามการบันทึกข้อมูลของแต่ละแดชบอร์ด' : 'อัปเดตล่าสุด: '+ov.updated}
         &nbsp;·&nbsp; แหล่งข้อมูล: ฐานข้อมูลความมั่นคง 8 ด้าน จังหวัดหนองบัวลำภู
@@ -1086,7 +1113,46 @@ function renderOverview(){
   });
 }
 
-/* เกจ 270° สไตล์ speedometer */
+/* -------- AI สรุปสถานการณ์รายด้าน (จากค่าล่าสุดทุกอำเภอ) -------- */
+const EXTRA_UNITS={'คดี':'คดี','ผู้ต้องหา':'ราย','ยาบ้า':'เม็ด','เข้าบำบัด':'ราย','บำบัดสำเร็จ':'ราย',
+  'มูลค่าเสียหาย':'บาท','ผู้เสียหาย':'ราย','เป้าหมายเฝ้าระวัง':'ราย','ดำเนินคดี':'ราย',
+  'ทรัพย์สินยึด/อายัด':'บาท','คดีบุกรุก':'คดี','พื้นที่ทวงคืน':'ไร่','ลงทะเบียน':'ราย',
+  'ไกล่เกลี่ยสำเร็จ':'ราย','มูลหนี้':'บาท','ตรวจสอบแล้ว':'แห่ง','เข้าข่าย':'แห่ง',
+  'นักท่องเที่ยว':'คน','เหตุการณ์':'ครั้ง'};
+
+/* รวมค่าทุกอำเภอของด้านหนึ่ง -> {label: total} */
+function provinceTotals(no){
+  const md = MAP_DATA && MAP_DATA.map && MAP_DATA.map[no];
+  if(!md) return null;
+  const tot={};
+  Object.values(md).forEach(rec=>{
+    Object.keys(rec.extra||{}).forEach(k=>{ tot[k]=(tot[k]||0)+(rec.extra[k]||0); });
+  });
+  return tot;
+}
+function buildAiSummaryHTML(){
+  return DOMAINS.filter(d=>!d.overview).map(d=>{
+    const tot=provinceTotals(d.no);
+    const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no):null;
+    let body;
+    if(tot && Object.values(tot).some(v=>v>0)){
+      const parts=Object.keys(tot).filter(k=>tot[k]>0).map(k=>
+        `${k} <b>${tot[k].toLocaleString('th-TH')}</b> ${EXTRA_UNITS[k]||''}`);
+      body=`สถานการณ์${d.short} ทั้งจังหวัด (ล่าสุด): ${parts.join(' <span class="ai-dot">•</span> ')}`;
+    } else if(rec && rec.hasData && rec.value>0){
+      body=`สถานการณ์${d.short} ทั้งจังหวัด (ล่าสุด): ${rec.metric} <b>${rec.value.toLocaleString('th-TH')}</b> ${rec.unit}`;
+    } else {
+      body=`สถานการณ์${d.short}: <span class="ai-wait">อยู่ระหว่างปรับปรุงข้อมูลจากหน่วยงานที่รับผิดชอบ</span>`;
+    }
+    return `<div class="ai-line" style="--ac:${d.hex}" onclick="gotoSlide(${d.no})">
+      <span class="ai-ic">${d.icon}</span><span class="ai-txt">${body}</span></div>`;
+  }).join('');
+}
+function refreshAiSummary(){
+  const el=document.getElementById('aiSum');
+  if(el) el.innerHTML=buildAiSummaryHTML();
+}
+
 function drawGauge(cv, val){
   const ctx = cv.getContext('2d');
   const W=cv.width,H=cv.height,cx=W/2,cy=H-38,R=118;
@@ -1205,7 +1271,7 @@ const MAP_CENTER=[17.225,102.332], MAP_ZOOM=9;
 
 /* โหลดข้อมูลแผนที่รายอำเภอ (JSONP) */
 window.handleMap = function(data){
-  if(data && data.map){ MAP_DATA=data; if(activeLayer && activeLayer!=='base') paintChoropleth(activeLayer); }
+  if(data && data.map){ MAP_DATA=data; if(activeLayer && activeLayer!=='base') paintChoropleth(activeLayer); refreshAiSummary(); }
 };
 function loadMapData(){
   if(!OVERVIEW_API || MAP_DATA) return;
@@ -1645,6 +1711,7 @@ document.querySelectorAll('[data-count]').forEach(el=>{
 document.querySelectorAll('[data-seal]').forEach(el=>el.src=SEAL);
 buildTicker();
 loadOverview();
+loadMapData();
 initVoices();
 window.addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('hide'),1900));
 setTimeout(()=>document.getElementById('loader').classList.add('hide'),4000);

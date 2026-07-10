@@ -512,6 +512,51 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .pill.ok{color:#0A2415;background:var(--ok)}
 .pill.warn{color:#2A1F00;background:var(--warn)}
 .pill.danger{color:#2A0505;background:var(--danger)}
+/* ----- Execution tracking (หน้าหลัก) ----- */
+.drive-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+@media(max-width:900px){.drive-grid{grid-template-columns:1fr}}
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:6px}
+.tl-item{display:flex;align-items:flex-start;gap:14px;position:relative;padding-bottom:18px}
+.tl-item:not(:last-child)::before{
+  content:"";position:absolute;left:7px;top:20px;bottom:0;width:2px;
+  background:rgba(255,255,255,.12);
+}
+.tl-item.done:not(:last-child)::before{background:var(--ok)}
+.tl-dot{
+  width:16px;height:16px;border-radius:50%;flex:none;margin-top:3px;
+  background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);
+}
+.tl-item.done .tl-dot{background:var(--ok);border-color:var(--ok)}
+.tl-item.now .tl-dot{background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 0 5px rgba(240,199,94,.18);animation:pulse 2s infinite}
+.tl-mon{font-family:'Chakra Petch';font-weight:700;font-size:13px;color:var(--gold-bright);width:42px;flex:none;margin-top:2px}
+.tl-txt{font-size:13.5px;color:var(--ink-dim);line-height:1.7;text-wrap:pretty}
+.tl-item.now .tl-txt{color:var(--ink)}
+.tl-item.now .tl-txt::after{content:" ● กำลังดำเนินการ";font-family:'Kanit';font-size:11.5px;color:var(--gold-bright)}
+.tl-item.done .tl-txt::after{content:" ✓";color:var(--ok);font-weight:700}
+.ready-wrap{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ready-num{font-family:'Chakra Petch';font-weight:700;font-size:52px;color:var(--gold-bright);line-height:1}
+.ready-of{font-size:20px;color:var(--ink-dim);font-weight:600;margin-left:6px}
+.ready-lbl{font-size:13px;color:var(--ink-dim)}
+.ready-bar{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.ready-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold-bright));transition:width 1s ease}
+.ready-note{font-size:12.5px;color:var(--ink-dim);line-height:1.7;text-wrap:pretty}
+
+/* ----- Data Submission Tracker ----- */
+.track-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
+.track-item{
+  --ac:var(--gold);
+  border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:12px 14px;
+  background:rgba(255,255,255,.02);cursor:pointer;transition:.2s;
+}
+.track-item:hover{background:rgba(255,255,255,.05);border-color:color-mix(in srgb,var(--ac) 45%, transparent)}
+.tk-head{display:flex;align-items:center;gap:8px;font-family:'Kanit';font-size:13px}
+.tk-head b{font-weight:500;flex:1;color:var(--ink);text-wrap:pretty}
+.tk-period{font-size:12px;color:var(--ink-dim);margin:7px 0 8px}
+.tk-dots{display:flex;align-items:center;gap:5px}
+.tk-dot{width:14px;height:8px;border-radius:99px;background:rgba(255,255,255,.1)}
+.tk-dot.on{background:var(--ac);box-shadow:0 0 6px color-mix(in srgb,var(--ac) 60%, transparent)}
+.tk-count{font-family:'Chakra Petch';font-size:11.5px;color:var(--ink-dim);margin-left:6px}
+
 /* ----- AI สรุปสถานการณ์ ----- */
 .ai-sum{display:flex;flex-direction:column;gap:9px}
 .ai-line{
@@ -655,6 +700,32 @@ footer b{color:var(--gold-bright);font-weight:600}
 </section>
 
 <!-- Domain cards -->
+<!-- Progress tracking -->
+<section class="section reveal">
+  <div class="sec-head"><span class="tag mono">EXECUTION TRACKING</span><h2>การขับเคลื่อนแผนปฏิบัติการ</h2></div>
+  <p class="sec-sub">ติดตามความคืบหน้าการดำเนินงานตามเป้าหมาย 4 เดือนสุดท้ายของปีงบประมาณ พ.ศ. 2569</p>
+  <div class="drive-grid">
+    <div class="plan-card">
+      <h3><span>🚀</span>เส้นทางสู่เป้าหมาย (มิ.ย. – ก.ย. 2569)</h3>
+      <div class="timeline" id="phaseTimeline">
+        <div class="tl-item" data-month="6"><div class="tl-dot"></div><div class="tl-mon">มิ.ย.</div><div class="tl-txt">ปรับปรุงฐานข้อมูล 9 ด้านให้เป็นปัจจุบัน</div></div>
+        <div class="tl-item" data-month="7"><div class="tl-dot"></div><div class="tl-mon">ก.ค.</div><div class="tl-txt">เชื่อมโยงข้อมูลระหว่างหน่วยงาน + Dashboard</div></div>
+        <div class="tl-item" data-month="8"><div class="tl-dot"></div><div class="tl-mon">ส.ค.</div><div class="tl-txt">ทดสอบระบบ + ซักซ้อม WAR Room</div></div>
+        <div class="tl-item" data-month="9"><div class="tl-dot"></div><div class="tl-mon">ก.ย.</div><div class="tl-txt">ใช้งานเต็มรูปแบบ เฝ้าระวัง–แจ้งเตือน–สั่งการ</div></div>
+      </div>
+    </div>
+    <div class="plan-card">
+      <h3><span>📶</span>ความพร้อมของระบบข้อมูล</h3>
+      <div class="ready-wrap">
+        <div class="ready-num"><span id="readyCount">0</span><span class="ready-of">/8 ด้าน</span></div>
+        <div class="ready-lbl">ฐานข้อมูลที่มีการรายงานข้อมูลแล้ว</div>
+        <div class="ready-bar"><i id="readyBar" style="width:0%"></i></div>
+        <div class="ready-note" id="readyNote">กำลังตรวจสอบสถานะการรายงาน…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="domains">
   <div class="sec-head reveal"><span class="tag mono">9 DOMAINS</span><h2>ฐานข้อมูลความมั่นคง 9 ด้าน</h2></div>
   <p class="sec-sub reveal">คลิก “เปิดนำเสนอ” เพื่อแสดงแดชบอร์ดของแต่ละด้านแบบเต็มจอภายในระบบนี้ หรือเปิดในแท็บใหม่เพื่อใช้งานแยก</p>
@@ -1053,6 +1124,23 @@ function renderOverview(){
           <span style="font-size:11.5px;color:var(--ink-dim);font-weight:400">สรุปจากค่าล่าสุดของทุกอำเภอ อัปเดตอัตโนมัติ</span></h4>
         <div class="ai-sum" id="aiSum">${buildAiSummaryHTML()}</div>
       </div>
+      <div class="ov-panel" style="grid-column:1/-1">
+        <h4>📡 การติดตามการรายงานข้อมูล <span class="tag2">DATA SUBMISSION TRACKER</span> <span style="flex:1"></span>
+          <span style="font-size:11.5px;color:var(--ink-dim);font-weight:400">แต่ละด้านรายงานงวดไหนล่าสุด · กี่อำเภอจาก 6</span></h4>
+        <div class="track-grid">
+          ${ov.domains.map(o=>{
+            const d=DOMAINS[o.no-1];
+            const rep=o.reported||0;
+            const dots=Array.from({length:6},(_,k)=>`<span class="tk-dot ${k<rep?'on':''}"></span>`).join('');
+            const tr = o.trend>0? `<span class="trend up">▲ ${o.trend}%</span>` : o.trend<0? `<span class="trend down">▼ ${Math.abs(o.trend)}%</span>` : `<span class="trend flat">—</span>`;
+            return `<div class="track-item" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
+              <div class="tk-head"><span>${d.icon}</span><b>ด้าน ${o.no} ${d.short}</b>${tr}</div>
+              <div class="tk-period">${o.period? '🗓 '+o.period : '<span class="ai-wait">ยังไม่มีการรายงาน</span>'}</div>
+              <div class="tk-dots">${dots}<span class="tk-count">${rep}/6 อำเภอ</span></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
       <div class="ov-note">
         ${ov.demo? '<span class="demo">⚠ ข้อมูลตัวอย่างเพื่อการออกแบบ</span> · เมื่อเชื่อมชีตสรุปกลางผ่าน Google Apps Script ตัวเลขจะอัปเดตอัตโนมัติตามการบันทึกข้อมูลของแต่ละแดชบอร์ด' : 'อัปเดตล่าสุด: '+ov.updated}
         &nbsp;·&nbsp; แหล่งข้อมูล: ฐานข้อมูลความมั่นคง 8 ด้าน จังหวัดหนองบัวลำภู
@@ -1247,11 +1335,37 @@ function resetAutoBar(){
 }
 
 /* -------- JSONP: โหลดข้อมูลภาพรวมจริง -------- */
+/* -------- Execution tracking (หน้าหลัก) -------- */
+function refreshDrive(){
+  /* ไทม์ไลน์: เทียบเดือนปัจจุบัน (มิ.ย.=6 … ก.ย.=9) */
+  const m = new Date().getMonth()+1;
+  document.querySelectorAll('#phaseTimeline .tl-item').forEach(el=>{
+    const pm = +el.dataset.month;
+    el.classList.remove('done','now');
+    if(m>pm) el.classList.add('done');
+    else if(m===pm) el.classList.add('now');
+  });
+  /* ความพร้อม: นับด้านที่มีข้อมูล */
+  const n = OVERVIEW.domains? OVERVIEW.domains.filter(o=>o.hasData).length : 0;
+  const el=document.getElementById('readyCount');
+  if(el){ animateNum(el,n); document.getElementById('readyBar').style.width=(n/8*100)+'%'; }
+  const note=document.getElementById('readyNote');
+  if(note){
+    if(OVERVIEW.demo) note.textContent='รอเชื่อมต่อข้อมูลจริงจากระบบ';
+    else if(n>=8) note.textContent='✓ ครบทุกด้าน — ระบบพร้อมใช้งานเต็มรูปแบบ';
+    else{
+      const missing=OVERVIEW.domains.filter(o=>!o.hasData).map(o=>DOMAINS[o.no-1].short);
+      note.textContent='รอการรายงานข้อมูล: '+missing.join(' · ');
+    }
+  }
+}
+
 window.handleOverview = function(data){
   try{
     if(data && Array.isArray(data.domains) && data.domains.length){
       OVERVIEW = {updated: data.updated||'', demo:false, domains: data.domains};
       buildTicker();
+      refreshDrive();
     }
   }catch(e){console.warn('overview parse error',e)}
 };
@@ -1710,6 +1824,7 @@ document.querySelectorAll('[data-count]').forEach(el=>{
 /* ================= INIT ================= */
 document.querySelectorAll('[data-seal]').forEach(el=>el.src=SEAL);
 buildTicker();
+refreshDrive();
 loadOverview();
 loadMapData();
 initVoices();

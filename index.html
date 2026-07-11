@@ -986,8 +986,7 @@ DOMAINS.forEach((d,i)=>{
 /* ================= TICKER ================= */
 function buildTicker(){
   const stClr = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)'};
-  /* ด้านที่มีผลงาน (มีข้อมูล) ขึ้นก่อน */
-  const ordered = [...OVERVIEW.domains].sort((a,b)=>((b.hasData&&b.value>0)?1:0)-((a.hasData&&a.value>0)?1:0));
+  const ordered = [...OVERVIEW.domains].sort((a,b)=>a.no-b.no);
   const items = ordered.map(o=>{
     const d = DOMAINS[o.no-1];
     return `<span class="tick-item" onclick="openPresent(${o.no-1})">

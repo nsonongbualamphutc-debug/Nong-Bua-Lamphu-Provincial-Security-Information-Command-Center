@@ -1287,7 +1287,12 @@ function buildAiSummaryHTML(){
     const tot=provinceTotals(d.no);
     const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no):null;
     let body;
-    if(tot && Object.values(tot).some(v=>v>0)){
+    const bd = rec && rec.breakdown? rec.breakdown : null;
+    if(bd && Object.keys(bd).length){
+      const parts=Object.keys(bd).filter(k=>bd[k]>0).map(k=>
+        `${k} <b>${bd[k].toLocaleString('th-TH')}</b>`);
+      body=`สถานการณ์${d.short} ทั้งจังหวัด: ${rec.metric} <b>${rec.value.toLocaleString('th-TH')}</b> ${rec.unit} <span class="ai-dot">•</span> ${parts.join(' <span class="ai-dot">•</span> ')}`;
+    } else if(tot && Object.values(tot).some(v=>v>0)){
       const parts=Object.keys(tot).filter(k=>tot[k]>0).map(k=>
         `${k} <b>${tot[k].toLocaleString('th-TH')}</b> ${EXTRA_UNITS[k]||''}`);
       body=`สถานการณ์${d.short} ทั้งจังหวัด (ล่าสุด): ${parts.join(' <span class="ai-dot">•</span> ')}`;

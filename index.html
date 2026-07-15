@@ -15,6 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --bg:#070D1F;
@@ -30,7 +31,7 @@
   --c5:#57CC99; --c6:#FF922B; --c7:#FF5D8F; --c8:#38B6FF; --c9:#F0C75E;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 body{
   font-family:'Sarabun',sans-serif;
   background:
@@ -122,7 +123,7 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .ticker{
   border-bottom:1px solid rgba(255,255,255,.06);
   background:rgba(255,255,255,.02);
-  overflow:hidden;white-space:nowrap;position:relative;
+  overflow:hidden;white-space:nowrap;position:relative;max-width:100%;
 }
 .ticker-inner{
   display:inline-flex;gap:44px;padding:8px 0;
@@ -273,6 +274,37 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
   color:#04140A;background:linear-gradient(135deg,#3DDC84,#7CF2B0);
   border-radius:99px;padding:4px 12px;font-weight:600;
 }
+
+/* ---------- Kiosk / TV mode ---------- */
+#kioskOverlay{position:fixed;inset:0;z-index:900;background:radial-gradient(circle at 50% 0%,#0c1832,#050a18 70%);display:none;flex-direction:column}
+#kioskOverlay.open{display:flex;animation:fadein .4s ease}
+.kiosk-top{display:flex;align-items:center;gap:20px;padding:22px 40px;border-bottom:2px solid var(--gold)}
+.kiosk-seal{width:64px;height:64px;object-fit:contain;flex:none}
+.kiosk-titles{flex:1}
+.kiosk-title{font-family:'Kanit';font-weight:600;font-size:clamp(20px,2.4vw,32px);color:#fff;line-height:1.2}
+.kiosk-sub{font-family:'Chakra Petch';font-size:clamp(11px,1.1vw,15px);letter-spacing:2px;color:var(--gold-bright)}
+.kiosk-clock{font-family:'Chakra Petch';font-weight:700;font-size:clamp(22px,2.6vw,38px);color:#fff}
+.kiosk-body{flex:1;display:flex;align-items:center;justify-content:center;padding:2vh 4vw;overflow:hidden}
+.kiosk-card{width:100%;max-width:1400px;text-align:center;animation:kioskIn .6s ease}
+@keyframes kioskIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:none}}
+.kiosk-ic{font-size:clamp(48px,7vw,96px);margin-bottom:2vh}
+.kiosk-dno{font-family:'Chakra Petch';font-weight:700;letter-spacing:4px;font-size:clamp(13px,1.4vw,18px);color:var(--gold-bright);margin-bottom:10px}
+.kiosk-dname{font-family:'Kanit';font-weight:600;font-size:clamp(26px,4vw,56px);color:#fff;line-height:1.15;margin-bottom:3vh;text-wrap:balance}
+.kiosk-metric{font-size:clamp(15px,1.8vw,24px);color:var(--ink-dim);margin-bottom:1vh}
+.kiosk-value{font-family:'Chakra Petch';font-weight:700;font-size:clamp(64px,13vw,190px);line-height:1;color:var(--gold-bright);text-shadow:0 0 60px rgba(240,199,94,.35)}
+.kiosk-unit{font-family:'Kanit';font-size:clamp(20px,2.5vw,40px);color:var(--ink-dim);margin-left:12px}
+.kiosk-wait{font-family:'Kanit';font-size:clamp(24px,3vw,44px);color:var(--ink-dim)}
+.kiosk-extra{display:flex;justify-content:center;gap:clamp(20px,4vw,70px);margin-top:4vh;flex-wrap:wrap}
+.kiosk-ex{text-align:center}
+.kiosk-ex .kx-v{font-family:'Chakra Petch';font-weight:700;font-size:clamp(24px,3.2vw,52px);color:#fff}
+.kiosk-ex .kx-l{font-family:'Kanit';font-size:clamp(12px,1.3vw,18px);color:var(--ink-dim)}
+.kiosk-status{display:inline-block;margin-top:3vh;font-family:'Kanit';font-weight:600;font-size:clamp(15px,1.7vw,24px);padding:8px 30px;border-radius:99px;color:#08130A}
+.kiosk-foot{padding:16px 40px}
+.kiosk-progress{height:5px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:12px}
+.kiosk-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));width:0}
+.kiosk-dots{display:flex;justify-content:center;gap:9px}
+.kiosk-dots span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18);transition:.3s}
+.kiosk-dots span.on{background:var(--gold-bright);transform:scale(1.3)}
 
 /* ---------- Map overlay ---------- */
 #mapOverlay{position:fixed;inset:0;z-index:880;background:#050A18;display:none;flex-direction:column}
@@ -555,6 +587,49 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .live-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.4s infinite}
 .live-time{font-size:10.5px;color:var(--ink-dim);letter-spacing:.5px;font-weight:400}
 
+/* ----- QR button + popup ----- */
+.qr-btn{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  font-family:'Chakra Petch';font-weight:600;font-size:12px;letter-spacing:1px;
+  color:var(--gold-bright);border:1px solid rgba(240,199,94,.4);border-radius:99px;
+  padding:6px 12px;background:rgba(240,199,94,.06);cursor:pointer;transition:.2s;
+}
+.qr-btn:hover{background:rgba(240,199,94,.14);border-color:var(--gold)}
+#qrPopup{
+  position:fixed;inset:0;z-index:920;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(3,7,18,.82);backdrop-filter:blur(6px);
+}
+#qrPopup.open{display:flex;animation:fadein .25s ease}
+.qr-modal{
+  position:relative;background:linear-gradient(180deg,#0e1a38,#0a1428);
+  border:1px solid var(--gold);border-radius:22px;padding:30px 34px;text-align:center;
+  box-shadow:0 24px 70px rgba(0,0,0,.6);max-width:340px;
+}
+.qr-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+  cursor:pointer;font-size:15px;
+}
+.qr-modal-title{font-family:'Kanit';font-weight:600;font-size:17px;color:#fff}
+.qr-modal-sub{font-size:12.5px;color:var(--ink-dim);margin:4px 0 18px}
+.qr-box{width:200px;height:200px;background:#fff;border-radius:14px;padding:12px;margin:0 auto}
+.qr-box img,.qr-box canvas{width:100%!important;height:100%!important;display:block}
+.qr-modal-hint{font-family:'Kanit';font-size:12.5px;color:var(--gold-bright);margin-top:16px}
+
+/* ----- Executive brief (hero) ----- */
+.exec-brief{
+  display:flex;flex-direction:column;gap:7px;margin:18px 0 4px;
+  border-left:3px solid var(--gold);padding:14px 18px;
+  background:linear-gradient(90deg,rgba(240,199,94,.08),rgba(240,199,94,.01));
+  border-radius:0 14px 14px 0;max-width:640px;
+}
+.eb-row{display:flex;align-items:flex-start;gap:11px;font-size:14.5px;line-height:1.6}
+.eb-ic{font-size:16px;flex:none;margin-top:1px}
+.eb-txt{color:var(--ink);text-wrap:pretty}
+.eb-txt b{font-family:'Chakra Petch';font-weight:700;color:var(--gold-bright)}
+.eb-txt .warn{color:var(--warn)} .eb-txt .ok{color:var(--ok)} .eb-txt .danger{color:var(--danger)}
+
 /* ----- Execution tracking (หน้าหลัก) ----- */
 .drive-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
 @media(max-width:900px){.drive-grid{grid-template-columns:1fr}}
@@ -638,6 +713,81 @@ footer b{color:var(--gold-bright);font-weight:600}
 
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease, transform .7s ease}
 .reveal.in{opacity:1;transform:none}
+/* ========== RESPONSIVE: แท็บเล็ต & มือถือ ========== */
+/* แท็บเล็ต (≤1024px) */
+@media(max-width:1024px){
+  .wrap{padding-left:16px;padding-right:16px}
+  .hero{gap:26px;padding-top:20px}
+  .hero h1{font-size:clamp(28px,5vw,44px)}
+  .ov-grid{grid-template-columns:1fr}
+  .track-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+}
+/* มือถือแนวนอน / แท็บเล็ตเล็ก (≤820px) */
+@media(max-width:820px){
+  .topbar{padding:8px 14px;gap:10px;flex-wrap:wrap}
+  .topbar .brand-th{font-size:14px}
+  .topbar .brand-en{font-size:9px}
+  .qr-btn span{display:none}
+  .live-badge{font-size:10px;padding:3px 9px}
+  .hero-actions{gap:8px}
+  .hero-actions .btn{font-size:13px;padding:9px 14px;flex:1 1 auto;justify-content:center;min-width:calc(50% - 4px)}
+  .exec-brief{max-width:100%}
+  .eb-row{font-size:13.5px}
+  .sec-head h2,.hero h1{font-size:clamp(24px,6vw,34px)}
+  .map-body{flex-direction:column}
+  .map-panel{width:100%;max-height:42vh;border-left:none;border-top:1px solid var(--line)}
+  #leafMap{min-height:46vh}
+  .p-title{font-size:15px}
+  .p-title small{display:none}
+  .kpi-strip{gap:9px}
+  .kpi-num{font-size:24px}
+  .kiosk-top{padding:14px 18px;gap:12px}
+  .kiosk-value{font-size:clamp(56px,18vw,110px)}
+}
+/* มือถือ (≤560px) */
+@media(max-width:560px){
+  .wrap{padding-left:12px;padding-right:12px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:12px}
+  .hero-actions .btn{min-width:100%}
+  .hero .lead{font-size:14px}
+  .card{padding:18px}
+  .card h3{font-size:16px}
+  .drive-grid,.plan-grid{grid-template-columns:1fr}
+  .track-grid{grid-template-columns:1fr}
+  .ready-num{font-size:44px}
+  .ov-panel{padding:16px}
+  .fc-chips{gap:5px}
+  .fc-chip{font-size:11.5px;padding:5px 10px}
+  .ai-txt,.alert-item{font-size:13px}
+  /* โหมดนำเสนอบนมือถือ: ปุ่มควบคุมเล็กลง เรียงพอดี */
+  .p-head{padding:8px 10px;gap:6px;flex-wrap:wrap}
+  .p-head .btn{padding:6px 10px;font-size:12px}
+  .p-num{width:34px;height:34px;font-size:15px}
+  .kpi-strip{flex-wrap:wrap;height:auto;padding:8px 12px}
+  .kpi-box{padding:0 8px}
+  .p-body:has(.kpi-strip){--kpi-h:120px}
+  .p-subtitle span{font-size:14px;padding:9px 14px}
+  .qr-modal{padding:24px 22px;max-width:300px}
+  .qr-box{width:170px;height:170px}
+  .kiosk-title{font-size:16px}
+  .kiosk-sub{display:none}
+  .kiosk-value{font-size:clamp(48px,20vw,90px)}
+  .kiosk-extra{gap:16px}
+  /* ticker เร็วขึ้นนิดบนจอเล็ก */
+  .live-time{display:none}
+}
+/* จอสูงพิเศษ / แนวตั้ง: กันเนื้อหาล้น */
+@media(max-height:560px) and (orientation:landscape){
+  .hero{min-height:auto}
+  .kiosk-value{font-size:clamp(40px,12vh,90px)}
+}
+/* ทัชสกรีน: ปุ่มใหญ่ขึ้นให้กดง่าย */
+@media(hover:none){
+  .btn{min-height:42px}
+  .card{cursor:default}
+  .ai-line,.alert-item,.track-item{-webkit-tap-highlight-color:transparent}
+}
+
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none}
@@ -670,6 +820,10 @@ footer b{color:var(--gold-bright);font-weight:600}
     <div class="t2 mono">NONG BUA LAM PHU · SECURITY DATA COMMAND CENTER · FY 2569</div>
   </div>
   <div class="spacer"></div>
+  <button class="qr-btn" onclick="toggleQR()" title="สแกนดูบนมือถือ" aria-label="QR code">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm0 3h3v5h-5v-2h-2v-3h2v2h2v-2zm-5 0h2v2h-2v-2z"/></svg>
+    <span>QR</span>
+  </button>
   <span class="live-badge" id="liveBadge">LIVE <span class="live-time" id="liveTime"></span></span>
   <div class="clock" id="clock">--:--:--</div>
   <button class="btn" onclick="toggleFS()" title="เต็มจอ (F)">⛶ เต็มจอ</button>
@@ -688,6 +842,11 @@ footer b{color:var(--gold-bright);font-weight:600}
     <span class="eyebrow">แผนปฏิบัติการ จังหวัดหนองบัวลำภู · ปีงบประมาณ พ.ศ. 2569</span>
     <h1>ศูนย์บัญชาการข้อมูลความมั่นคง<br>จังหวัดหนองบัวลำภู</h1>
     <div class="h-sub">การบูรณาการเชื่อมโยงฐานข้อมูลด้านความมั่นคง <b>9 ด้าน</b> ในระบบเดียว</div>
+    <div class="exec-brief" id="execBrief">
+      <div class="eb-row"><span class="eb-ic">📊</span><span class="eb-txt" id="ebData">กำลังตรวจสอบสถานะการรายงานข้อมูล…</span></div>
+      <div class="eb-row"><span class="eb-ic">🎯</span><span class="eb-txt" id="ebIndex">—</span></div>
+      <div class="eb-row"><span class="eb-ic">⚠️</span><span class="eb-txt" id="ebFocus">—</span></div>
+    </div>
     <p class="lead">
       บูรณาการข้อมูลจาก <b>ทุกหน่วยงานความมั่นคงในพื้นที่</b> — ฝ่ายปกครอง ตำรวจ ทหาร ป่าไม้ พาณิชย์ และสถิติจังหวัด —
       เข้าสู่แดชบอร์ดกลาง เพื่อสนับสนุนการตัดสินใจของผู้บริหาร
@@ -697,6 +856,8 @@ footer b{color:var(--gold-bright);font-weight:600}
       <button class="btn primary" onclick="openPresent(-1)">▶ นำเสนอครบ 9 ด้าน</button>
       <button class="btn" onclick="openPresent(8)">🛡️ ภาพรวมความมั่นคง</button>
       <button class="btn" onclick="openMap()">🗺️ แผนที่รวมจังหวัด</button>
+      <button class="btn" onclick="openKiosk()">📺 โหมดจอใหญ่</button>
+      <button class="btn" onclick="exportHomePDF()">🖨️ พิมพ์รายงาน</button>
       <a class="btn" href="#domains">🗂️ เลือกดูรายด้าน</a>
     </div>
     <div class="stats">
@@ -785,6 +946,35 @@ footer b{color:var(--gold-bright);font-weight:600}
   จัดทำโดย สำนักงานสถิติจังหวัดหนองบัวลำภู<br>
   <span class="mono" style="font-size:11.5px;letter-spacing:1.5px">INTEGRATED SECURITY DATABASE · FISCAL YEAR 2569</span>
 </footer>
+
+<!-- QR popup -->
+<div id="qrPopup" onclick="toggleQR()">
+  <div class="qr-modal" onclick="event.stopPropagation()">
+    <button class="qr-close" onclick="toggleQR()">✕</button>
+    <div class="qr-modal-title">ศูนย์บัญชาการข้อมูลความมั่นคง</div>
+    <div class="qr-modal-sub">สแกนเพื่อเปิดบนโทรศัพท์ / แท็บเล็ต</div>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="qr-modal-hint">📱 ใช้กล้องมือถือสแกน QR Code นี้</div>
+  </div>
+</div>
+
+<!-- Kiosk / TV mode -->
+<div id="kioskOverlay">
+  <div class="kiosk-top">
+    <img data-seal class="kiosk-seal" alt="">
+    <div class="kiosk-titles">
+      <div class="kiosk-title">ศูนย์บัญชาการข้อมูลความมั่นคง จังหวัดหนองบัวลำภู</div>
+      <div class="kiosk-sub">SECURITY DATA COMMAND CENTER · เฝ้าระวังสถานการณ์แบบเรียลไทม์</div>
+    </div>
+    <div class="kiosk-clock" id="kioskClock">--:--</div>
+    <button class="btn" onclick="closeKiosk()" style="flex:none">✕ ออก</button>
+  </div>
+  <div class="kiosk-body" id="kioskBody"></div>
+  <div class="kiosk-foot">
+    <div class="kiosk-progress"><i id="kioskBar"></i></div>
+    <div class="kiosk-dots" id="kioskDots"></div>
+  </div>
+</div>
 
 <!-- Map overlay -->
 <div id="mapOverlay" role="dialog" aria-modal="true" aria-label="แผนที่รวมจังหวัด">
@@ -1405,6 +1595,28 @@ function resetAutoBar(){
 
 /* -------- JSONP: โหลดข้อมูลภาพรวมจริง -------- */
 /* -------- Execution tracking (หน้าหลัก) -------- */
+/* -------- Executive brief (3 บรรทัดบนสุด) -------- */
+function refreshExecBrief(){
+  const d=OVERVIEW.domains;
+  if(!d || OVERVIEW.demo){
+    document.getElementById('ebData').innerHTML='ระบบพร้อมเชื่อมต่อข้อมูลจริงจากทั้ง 8 ด้าน';
+    document.getElementById('ebIndex').innerHTML='ดัชนีความมั่นคงรวมจะคำนวณเมื่อมีข้อมูล';
+    document.getElementById('ebFocus').innerHTML='รอการรายงานข้อมูลจากหน่วยงาน';
+    return;
+  }
+  const nData=d.filter(o=>o.hasData).length;
+  const idx=Math.round(d.reduce((a,o)=>a+o.index,0)/d.length);
+  const st = idx>=80?['ปกติ','ok']:idx>=60?['เฝ้าระวัง','warn']:['ต้องเร่งดำเนินการ','danger'];
+  const worst=[...d].sort((a,b)=>a.index-b.index)[0];
+  const noData=d.filter(o=>!o.hasData).map(o=>DOMAINS[o.no-1].short);
+  document.getElementById('ebData').innerHTML=
+    `รายงานข้อมูลแล้ว <b>${nData}</b> จาก <b>8</b> ด้าน${nData<8? ' · รอ '+noData.slice(0,3).join(' · ')+(noData.length>3?' ฯลฯ':'') : ' · <span class="ok">ครบทุกด้าน</span>'}`;
+  document.getElementById('ebIndex').innerHTML=
+    `ดัชนีความมั่นคงรวม <b>${idx}</b>/100 · สถานะ <span class="${st[1]}">${st[0]}</span>`;
+  document.getElementById('ebFocus').innerHTML=
+    `ด้านที่ต้องจับตาที่สุด: <b>${DOMAINS[worst.no-1].short}</b> (ดัชนี ${worst.index})`;
+}
+
 function refreshDrive(){
   /* ไทม์ไลน์: เทียบเดือนปัจจุบัน (มิ.ย.=6 … ก.ย.=9) */
   const m = new Date().getMonth()+1;
@@ -1438,6 +1650,7 @@ window.handleOverview = function(data){
       document.getElementById('liveBadge')?.classList.add('on');
       buildTicker();
       refreshDrive();
+      refreshExecBrief();
       renderAlerts('homeAlerts');
       if(document.getElementById('ovAlerts')) renderAlerts('ovAlerts');
     }
@@ -1964,6 +2177,16 @@ function repeatNarration(){
 
 document.addEventListener('keydown', e=>{
   if(e.key==='f'||e.key==='F'){toggleFS();return}
+  if(document.getElementById('qrPopup').classList.contains('open')){
+    if(e.key==='Escape') toggleQR();
+    return;
+  }
+  if(document.getElementById('kioskOverlay').classList.contains('open')){
+    if(e.key==='Escape') closeKiosk();
+    else if(e.key==='ArrowRight'){ kioskIdx=(kioskIdx+1)%kioskSlides().length; renderKiosk(); startKioskCycle(); }
+    else if(e.key==='ArrowLeft'){ kioskIdx=(kioskIdx-1+kioskSlides().length)%kioskSlides().length; renderKiosk(); startKioskCycle(); }
+    return;
+  }
   if(document.getElementById('mapOverlay').classList.contains('open')){
     if(e.key==='Escape') closeMap();
     return;
@@ -2006,10 +2229,123 @@ document.querySelectorAll('[data-count]').forEach(el=>{
   obs.observe(el);
 });
 
+/* ================= KIOSK / TV MODE ================= */
+let kioskTimer=null, kioskClockTimer=null, kioskIdx=0;
+function kioskSlides(){
+  const arr=[{overview:true}];
+  DOMAINS.filter(d=>!d.overview).forEach(d=>arr.push({no:d.no}));
+  return arr;
+}
+function openKiosk(){
+  document.getElementById('kioskOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  kioskIdx=0;
+  const dots=document.getElementById('kioskDots');
+  const slides=kioskSlides();
+  dots.innerHTML=slides.map((_,i)=>`<span class="${i===0?'on':''}"></span>`).join('');
+  renderKiosk();
+  clearInterval(kioskClockTimer);
+  kioskClockTimer=setInterval(()=>{ const el=document.getElementById('kioskClock'); if(el) el.textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}); },1000);
+  document.getElementById('kioskClock').textContent=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  startKioskCycle();
+  if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+}
+function closeKiosk(){
+  document.getElementById('kioskOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  clearInterval(kioskTimer); clearInterval(kioskClockTimer);
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+function startKioskCycle(){
+  clearInterval(kioskTimer);
+  const DUR=8000;
+  const bar=document.getElementById('kioskBar');
+  let t0=Date.now();
+  kioskTimer=setInterval(()=>{
+    const p=(Date.now()-t0)/DUR;
+    if(bar) bar.style.width=Math.min(100,p*100)+'%';
+    if(p>=1){ kioskIdx=(kioskIdx+1)%kioskSlides().length; renderKiosk(); t0=Date.now(); }
+  },50);
+}
+function renderKiosk(){
+  const slides=kioskSlides();
+  const s=slides[kioskIdx];
+  const body=document.getElementById('kioskBody');
+  document.querySelectorAll('#kioskDots span').forEach((x,i)=>x.classList.toggle('on',i===kioskIdx));
+
+  if(s.overview){
+    const d=OVERVIEW.domains||[];
+    const idx=d.length? Math.round(d.reduce((a,o)=>a+o.index,0)/d.length):0;
+    const nOk=d.filter(o=>o.status==='ok').length, nWarn=d.filter(o=>o.status==='warn').length, nDanger=d.filter(o=>o.status==='danger').length;
+    const st=idx>=80?['สถานการณ์ปกติ','var(--ok)']:idx>=60?['เฝ้าระวัง','var(--warn)']:['เร่งดำเนินการ','var(--danger)'];
+    body.innerHTML=`<div class="kiosk-card">
+      <div class="kiosk-ic">🛡️</div>
+      <div class="kiosk-dno">ภาพรวมความมั่นคง จังหวัดหนองบัวลำภู</div>
+      <div class="kiosk-metric">ดัชนีความมั่นคงรวม</div>
+      <div class="kiosk-value" style="color:${st[1]}">${idx}<span class="kiosk-unit">/ 100</span></div>
+      <div class="kiosk-extra">
+        <div class="kiosk-ex"><div class="kx-v" style="color:var(--ok)">${nOk}</div><div class="kx-l">ปกติ</div></div>
+        <div class="kiosk-ex"><div class="kx-v" style="color:var(--warn)">${nWarn}</div><div class="kx-l">เฝ้าระวัง</div></div>
+        <div class="kiosk-ex"><div class="kx-v" style="color:var(--danger)">${nDanger}</div><div class="kx-l">เร่งด่วน</div></div>
+      </div>
+      <div class="kiosk-status" style="background:${st[1]}">${st[0]}</div>
+    </div>`;
+    return;
+  }
+  const d=DOMAINS[s.no-1];
+  const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===s.no):null;
+  const has=rec&&rec.hasData&&rec.value>0;
+  const stTxt=rec?(rec.status==='ok'?['ปกติ','var(--ok)']:rec.status==='warn'?['เฝ้าระวัง','var(--warn)']:['เร่งด่วน','var(--danger)']):['—','var(--ink-dim)'];
+  let extra='';
+  if(rec&&rec.breakdown&&Object.keys(rec.breakdown).length){
+    extra=`<div class="kiosk-extra">${Object.keys(rec.breakdown).map(k=>
+      `<div class="kiosk-ex"><div class="kx-v">${rec.breakdown[k].toLocaleString('th-TH')}</div><div class="kx-l">${k}</div></div>`).join('')}</div>`;
+  }
+  body.innerHTML=`<div class="kiosk-card">
+    <div class="kiosk-ic">${d.icon}</div>
+    <div class="kiosk-dno">ด้านที่ ${d.no} / 9</div>
+    <div class="kiosk-dname">${d.short}</div>
+    <div class="kiosk-metric">${rec?rec.metric:d.title}</div>
+    ${has? `<div class="kiosk-value" style="color:${d.hex}">${rec.value.toLocaleString('th-TH')}<span class="kiosk-unit">${rec.unit}</span></div>`
+          : `<div class="kiosk-wait">⏳ อยู่ระหว่างการรายงานข้อมูล</div>`}
+    ${extra}
+    ${has? `<div class="kiosk-status" style="background:${stTxt[1]}">${stTxt[0]}</div>`:''}
+  </div>`;
+}
+
+/* ================= PDF หน้าหลัก (ใช้ตัวเดียวกับด้าน 9) ================= */
+function exportHomePDF(){
+  if(!window.jspdf){ alert('กำลังโหลดไลบรารีสร้าง PDF — กรุณาลองอีกครั้งใน 2-3 วินาที (ต้องเชื่อมต่ออินเทอร์เน็ต)'); return; }
+  exportPDF();
+}
+
+/* ================= QR popup ================= */
+let qrMade=false;
+function toggleQR(){
+  const pop=document.getElementById('qrPopup');
+  const willOpen=!pop.classList.contains('open');
+  pop.classList.toggle('open');
+  if(willOpen && !qrMade){
+    try{
+      if(window.QRCode){
+        new QRCode(document.getElementById('qrBox'), {
+          text: location.href.split('#')[0],
+          width:176, height:176, colorDark:'#0B1530', colorLight:'#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        qrMade=true;
+      } else {
+        document.getElementById('qrBox').innerHTML='<div style="color:#0B1530;font-size:12px;padding:20px">ไม่สามารถสร้าง QR ได้<br>(ต้องเชื่อมต่ออินเทอร์เน็ต)</div>';
+      }
+    }catch(e){}
+  }
+}
+
 /* ================= INIT ================= */
 document.querySelectorAll('[data-seal]').forEach(el=>el.src=SEAL);
 buildTicker();
 refreshDrive();
+refreshExecBrief();
 renderAlerts('homeAlerts');
 loadOverview();
 loadMapData();

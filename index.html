@@ -675,7 +675,45 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .tk-dot.on{background:var(--ac);box-shadow:0 0 6px color-mix(in srgb,var(--ac) 60%, transparent)}
 .tk-count{font-family:'Chakra Petch';font-size:11.5px;color:var(--ink-dim);margin-left:6px}
 
-/* ----- AI สรุปสถานการณ์ ----- */
+/* ----- สูตรดัชนีอัตโนมัติ ----- */
+.idx-formula{
+  margin-top:14px;border:1px dashed rgba(240,199,94,.35);border-radius:11px;
+  padding:12px 15px;background:rgba(240,199,94,.04);
+}
+.if-title{font-family:'Kanit';font-size:12.5px;color:var(--gold-bright);margin-bottom:8px}
+.if-parts{display:flex;gap:14px;flex-wrap:wrap}
+.if-parts span{font-size:12px;color:var(--ink-dim);display:inline-flex;align-items:center;gap:6px}
+.if-parts b{font-family:'Chakra Petch';font-weight:700;font-size:15px;color:var(--ink)}
+
+/* ----- บทสรุปผู้บริหาร (narrative) ----- */
+.copy-brief{
+  font-family:'Kanit';font-size:12px;color:var(--gold-bright);cursor:pointer;
+  border:1px solid rgba(240,199,94,.4);border-radius:99px;padding:5px 14px;
+  background:rgba(240,199,94,.06);transition:.2s;
+}
+.copy-brief:hover{background:rgba(240,199,94,.14)}
+.exec-period{font-size:12px;color:var(--ink-dim);margin:-4px 0 12px;font-family:'Kanit'}
+.exec-lines{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.exln{
+  display:block;font-size:14px;line-height:1.85;color:var(--ink);text-wrap:pretty;
+  padding:10px 15px;border-radius:11px;background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.06);border-left:3px solid var(--gold);
+}
+.exln b{font-family:'Chakra Petch';font-weight:700;color:var(--gold-bright)}
+.exln .hl{
+  font-family:'Kanit';font-weight:600;color:var(--gold-bright);
+  background:rgba(240,199,94,.1);border-radius:6px;padding:1px 7px;
+}
+.exln.warn{border-left-color:var(--warn);background:rgba(255,190,74,.05)}
+.exln.warn .hl{color:var(--warn);background:rgba(255,190,74,.12)}
+.ai-detail-head{
+  font-family:'Kanit';font-weight:600;font-size:13px;color:var(--ink-dim);
+  margin:4px 0 10px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:10px;
+}
+.adh-hint{font-weight:400;font-size:11px;opacity:.7}
+
+/* ----- AI สรุปสถานการณ์ (executive style) ----- */
 .ai-sum{display:flex;flex-direction:column;gap:9px}
 .ai-line{
   --ac:var(--gold);
@@ -685,9 +723,25 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
   transition:.2s;
 }
 .ai-line:hover{background:rgba(255,255,255,.05);transform:translateX(3px)}
-.ai-ic{font-size:18px;flex:none;margin-top:1px}
-.ai-txt{font-size:14px;line-height:1.8;color:var(--ink);text-wrap:pretty}
-.ai-txt b{font-family:'Chakra Petch';font-weight:700;color:var(--gold-bright);font-size:15.5px}
+.ai-line.good{background:rgba(61,220,132,.04)}
+.ai-line.watch{background:rgba(255,190,74,.05)}
+.ai-ic{font-size:18px;flex:none;margin-top:2px}
+.ai-body{flex:1;min-width:0}
+.ai-top{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.ai-name{font-family:'Kanit';font-weight:600;font-size:13px;color:var(--ink-dim)}
+.ai-badge{
+  font-family:'Kanit';font-weight:500;font-size:10.5px;border-radius:99px;padding:2px 10px;
+  border:1px solid rgba(255,255,255,.14);color:var(--ink-dim);
+}
+.ai-badge.good{color:var(--ok);border-color:rgba(61,220,132,.45);background:rgba(61,220,132,.08)}
+.ai-badge.watch{color:var(--warn);border-color:rgba(255,190,74,.45);background:rgba(255,190,74,.08)}
+.ai-badge.wait{color:var(--ink-dim);border-style:dashed}
+.ai-head{font-size:14px;line-height:1.7;color:var(--ink);text-wrap:pretty}
+.ai-head b{font-family:'Chakra Petch';font-weight:700;color:var(--gold-bright);font-size:15.5px}
+.ai-line.good .ai-head b{color:var(--ok)}
+.ai-line.watch .ai-head b{color:var(--warn)}
+.ai-sub{font-size:12px;color:var(--ink-dim);margin-top:4px;line-height:1.7;text-wrap:pretty}
+.ai-sub b{font-family:'Chakra Petch';font-weight:600;color:var(--ink)}
 .ai-dot{color:var(--ac);margin:0 2px}
 .ai-wait{color:var(--ink-dim);font-style:normal}
 
@@ -1329,8 +1383,16 @@ function renderOverview(){
         </div>
       </div>
       <div class="ov-panel">
-        <h4>📊 ดัชนีย่อยรายด้าน <span class="tag2">SUB-INDEX BY DOMAIN</span></h4>
-        <div class="chart-box"><canvas id="ovBar"></canvas></div>
+        <h4>📊 ดัชนีย่อยรายด้าน <span class="tag2">SUB-INDEX · AUTO</span></h4>
+        <div class="chart-box" style="height:340px"><canvas id="ovBar"></canvas></div>
+        <div class="idx-formula">
+          <div class="if-title">🤖 ดัชนีคำนวณอัตโนมัติจากข้อมูลจริง — ไม่ต้องมีเจ้าหน้าที่กรอก</div>
+          <div class="if-parts">
+            <span><b>40</b> การรายงานข้อมูล</span>
+            <span><b>40</b> ผลการดำเนินงาน (เรื่องที่ยุติ/เสร็จสิ้น)</span>
+            <span><b>20</b> แนวโน้มเทียบงวดก่อน</span>
+          </div>
+        </div>
       </div>
       <div class="ov-panel">
         <h4>🛡️ โปรไฟล์ความมั่นคงจังหวัด <span class="tag2">SECURITY PROFILE</span></h4>
@@ -1359,8 +1421,11 @@ function renderOverview(){
         </div>
       </div>
       <div class="ov-panel" style="grid-column:1/-1">
-        <h4>🧠 AI สรุปสถานการณ์รายด้าน <span class="tag2">AI SITUATION BRIEF</span> <span style="flex:1"></span>
-          <span style="font-size:11.5px;color:var(--ink-dim);font-weight:400">สรุปจากค่าล่าสุดของทุกอำเภอ อัปเดตอัตโนมัติ</span></h4>
+        <h4>🧠 บทสรุปผู้บริหาร <span class="tag2">AI วิเคราะห์อัตโนมัติ</span> <span style="flex:1"></span>
+          <button class="copy-brief" onclick="copyExecBrief(this)">📋 คัดลอกรายงาน</button></h4>
+        <p class="exec-period" id="execPeriod"></p>
+        <div class="exec-lines" id="execLines"></div>
+        <div class="ai-detail-head">รายละเอียดรายด้าน <span class="adh-hint">คลิกเพื่อเข้าดูแดชบอร์ด</span></div>
         <div class="ai-sum" id="aiSum">${buildAiSummaryHTML()}</div>
       </div>
       <div class="ov-panel" style="grid-column:1/-1">
@@ -1400,6 +1465,7 @@ function renderOverview(){
 
   drawGauge(document.getElementById('ovGauge'), idx);
   renderAlerts('ovAlerts');
+  renderExecNarrative();
   buildFcChips();
   renderForecast(fcDomain);
   if(!TREND_DATA) loadTrendData();
@@ -1455,6 +1521,71 @@ function renderOverview(){
   });
 }
 
+/* -------- บทสรุปผู้บริหารเชิงบรรยาย (สไตล์เดียวกับแดชบอร์ดยาเสพติด) -------- */
+function buildExecNarrative(){
+  const lines=[], plain=[];
+  const d=OVERVIEW.domains;
+  if(!d || OVERVIEW.demo){
+    lines.push({t:'ยัง<b>ไม่มีการเชื่อมต่อข้อมูลจริง</b> — เมื่อหน่วยงานรายงานข้อมูลผ่านระบบ บทสรุปจะประมวลผลให้อัตโนมัติ'});
+    return {lines, plain:['รอเชื่อมต่อข้อมูล']};
+  }
+  const nData=d.filter(o=>o.hasData).length;
+  const idx=Math.round(d.reduce((a,o)=>a+o.index,0)/d.length);
+  const st = idx>=80?'อยู่ในเกณฑ์ปกติ':idx>=60?'อยู่ในระดับเฝ้าระวัง':'ต้องเร่งดำเนินการ';
+
+  /* L1: ภาพรวม */
+  lines.push({t:`ภาพรวมความมั่นคง ทั้งจังหวัด: ดัชนีความมั่นคงรวม <span class="hl">${idx}/100</span> ${st} • หน่วยงานรายงานข้อมูลแล้ว <span class="hl">${nData} จาก 8 ด้าน</span>`});
+  plain.push(`ภาพรวม: ดัชนีรวม ${idx}/100 (${st}) | รายงานแล้ว ${nData}/8 ด้าน`);
+
+  /* L2: ผลงานเด่น — รวบจากด้านที่ได้ป้ายเขียว */
+  const goods=[], moves=[], warns=[];
+  d.forEach(o=>{
+    if(!o.hasData) return;
+    const dm=DOMAINS[o.no-1];
+    const B=domainBrief(dm,o);
+    const short=B.head.replace(/<[^>]+>/g,'');
+    if(B.cls==='good') goods.push({no:o.no,name:dm.short,txt:short});
+    else if(B.cls==='watch') warns.push({no:o.no,name:dm.short,txt:short});
+    else moves.push({no:o.no,name:dm.short,txt:short});
+  });
+  if(goods.length){
+    lines.push({t:`<span class="hl">ผลงานเด่น:</span> ${goods.map(g=>`${g.name} — ${g.txt}`).join(' • ')}`});
+    plain.push('ผลงานเด่น: '+goods.map(g=>`${g.name} ${g.txt}`).join(' | '));
+  }
+  /* L3: งานที่กำลังขับเคลื่อน */
+  if(moves.length){
+    lines.push({t:`งานที่กำลังขับเคลื่อน: ${moves.map(m=>`${m.name} — ${m.txt}`).join(' • ')}`});
+    plain.push('กำลังขับเคลื่อน: '+moves.map(m=>`${m.name} ${m.txt}`).join(' | '));
+  }
+  /* L4: ข้อควรเร่งรัด (เตือน) */
+  const urg=[];
+  warns.forEach(w=>urg.push(`${w.name}: ${w.txt}`));
+  const noData=d.filter(o=>!o.hasData).map(o=>DOMAINS[o.no-1].short);
+  if(noData.length) urg.push(`เร่งรัดการรายงานข้อมูล ${noData.join(' · ')} เพื่อให้ภาพสถานการณ์ครบทุกด้าน`);
+  if(urg.length){
+    lines.push({t:`<span class="hl">ข้อควรเร่งรัด:</span> ${urg.join(' • ')}`, warn:true});
+    plain.push('ข้อควรเร่งรัด: '+urg.join('; '));
+  }
+  return {lines, plain};
+}
+function renderExecNarrative(){
+  const box=document.getElementById('execLines');
+  if(!box) return;
+  const N=buildExecNarrative();
+  box.innerHTML=N.lines.map(l=>`<span class="exln${l.warn?' warn':''}">${l.t}</span>`).join('');
+  const per=document.getElementById('execPeriod');
+  if(per) per.textContent=`ข้อมูล ณ ${OVERVIEW.updated||new Date().toLocaleDateString('th-TH')} • ทั้งจังหวัด • ประมวลผลจากข้อมูลจริง 8 ด้าน`;
+  window.__execPlain = `บทสรุปผู้บริหาร — ศูนย์บัญชาการข้อมูลความมั่นคง จ.หนองบัวลำภู\n`+
+    N.plain.map(x=>'• '+x).join('\n')+`\n(ออกรายงานโดยระบบ ${new Date().toLocaleString('th-TH')})`;
+}
+function copyExecBrief(btn){
+  renderExecNarrative();
+  navigator.clipboard.writeText(window.__execPlain||'').then(()=>{
+    const o=btn.innerHTML; btn.innerHTML='✅ คัดลอกแล้ว';
+    setTimeout(()=>btn.innerHTML=o,1800);
+  }).catch(()=>{});
+}
+
 /* -------- AI สรุปสถานการณ์รายด้าน (จากค่าล่าสุดทุกอำเภอ) -------- */
 const EXTRA_UNITS={'คดี':'คดี','ผู้ต้องหา':'ราย','ยาบ้า':'เม็ด','เข้าบำบัด':'ราย','บำบัดสำเร็จ':'ราย',
   'มูลค่าเสียหาย':'บาท','ผู้เสียหาย':'ราย','เป้าหมายเฝ้าระวัง':'ราย','ดำเนินคดี':'ราย',
@@ -1472,32 +1603,93 @@ function provinceTotals(no){
   });
   return tot;
 }
+/* -------- เครื่องยนต์สรุปผู้บริหารรายด้าน: เลือกประเด็นเด็ดอัตโนมัติ -------- */
+const HIGHER_BETTER={1:true,2:false,3:true,4:true,5:false,6:false,7:true,8:true};
+const MONEY_LABELS=['มูลค่าความเสียหาย','มูลหนี้','หนี้คงเหลือ','มูลค่าทรัพย์สิน'];
+const GOOD_STATUS=['เสร็จ','ยุติ','สำเร็จ','ส่งฟ้อง','ไม่พบความผิด'];
+function fmtMoney(v){
+  if(v>=1e6) return (v/1e6).toFixed(1).replace(/\.0$/,'')+' ล้านบาท';
+  return Math.round(v).toLocaleString('th-TH')+' บาท';
+}
+function domainBrief(d, rec){
+  if(!rec || !rec.hasData || rec.value<=0)
+    return {badge:'⏳ รอข้อมูล', cls:'wait',
+            head:'อยู่ระหว่างการรายงานข้อมูลจากหน่วยงานที่รับผิดชอบ', sub:''};
+
+  const bd=rec.breakdown||{};
+  let done=0, all=0;
+  Object.keys(bd).forEach(k=>{ all+=bd[k]; if(GOOD_STATUS.some(g=>k.includes(g))) done+=bd[k]; });
+  const ratio = all>0? done/all : null;
+  const hb = HIGHER_BETTER[d.no]!==false;
+  const val = rec.value.toLocaleString('th-TH');
+
+  let head=null, badge='🔵 สถานะล่าสุด', cls='info';
+
+  /* ประเด็น 1: แนวโน้มเปลี่ยนแรง (±15%) — เรื่องใหญ่สุดเสมอ */
+  if(Math.abs(rec.trend)>=15){
+    const goodDir = hb? rec.trend>0 : rec.trend<0;
+    if(goodDir){
+      badge='🟢 ผลงานเด่น'; cls='good';
+      head = d.no===2
+        ? `คดีลดลง <b>${Math.abs(rec.trend)}%</b> จากปีก่อน — เหลือ <b>${val}</b> ${rec.unit} สะท้อนผลการป้องปรามที่ได้ผล`
+        : `${rec.metric} <b>${val}</b> ${rec.unit} — เพิ่มขึ้น <b>${Math.abs(rec.trend)}%</b> จากงวดก่อน`;
+    } else {
+      badge='🟡 ต้องติดตาม'; cls='watch';
+      head = `${rec.metric} ${hb?'ลดลง':'เพิ่มขึ้น'} <b>${Math.abs(rec.trend)}%</b> จากงวดก่อน — ปัจจุบัน <b>${val}</b> ${rec.unit}`;
+    }
+  }
+  /* ประเด็น 2: อัตราแล้วเสร็จสูง = ผลงาน / มีเรื่องค้าง = ความคืบหน้า */
+  if(!head && ratio!==null){
+    if(ratio>=0.6){
+      badge='🟢 ผลงานเด่น'; cls='good';
+      head=`ดำเนินการแล้วเสร็จ <b>${done}</b> จาก <b>${all}</b> ${rec.unit} คิดเป็น <b>${Math.round(ratio*100)}%</b>`;
+    } else {
+      head=`รับเรื่อง <b>${all}</b> ${rec.unit} — แล้วเสร็จ <b>${done}</b> · อยู่ระหว่างดำเนินการ <b>${all-done}</b>`;
+    }
+  }
+  /* ประเด็น 3: ตัวเลขหลักธรรมดา */
+  if(!head) head=`${rec.metric} รวม <b>${val}</b> ${rec.unit}`;
+
+  /* บรรทัดรอง: เก็บแต่ที่น่าสนใจจริง ไม่เกิน 3 */
+  const subs=[];
+  if(ratio!==null && cls!=='info' && Math.abs(rec.trend)>=15)
+    subs.push(`แล้วเสร็จ ${done}/${all} (${Math.round(ratio*100)}%)`);
+  const tot=provinceTotals(d.no)||{};
+  /* ประเด็นทอง: ลดมูลหนี้ให้ประชาชน (มีทั้งก่อน/หลัง) */
+  if(tot['มูลหนี้']>0 && tot['หนี้คงเหลือ']>=0 && tot['หนี้คงเหลือ']<tot['มูลหนี้']){
+    const cut=tot['มูลหนี้']-tot['หนี้คงเหลือ'];
+    subs.push(`ช่วยลดภาระหนี้ประชาชนได้ <b>${fmtMoney(cut)}</b> (${Math.round(cut/tot['มูลหนี้']*100)}% ของมูลหนี้ ${fmtMoney(tot['มูลหนี้'])})`);
+  } else {
+    MONEY_LABELS.forEach(L=>{ if(tot[L]>0) subs.push(`${L} <b>${fmtMoney(tot[L])}</b>`); });
+  }
+  if(d.no===7 && (tot['พบเข้าข่ายนอมินี']||0)===0)
+    subs.push(`ตรวจแล้วยังไม่พบผู้เข้าข่ายกระทำผิด`);
+  const md=MAP_DATA && MAP_DATA.map && MAP_DATA.map[d.no];
+  if(md){
+    const arr=Object.keys(md).map(a=>({a,v:md[a].main||0})).sort((x,y)=>y.v-x.v);
+    if(arr.length && arr[0].v>0 && arr.filter(x=>x.v>0).length>1)
+      subs.push(`พื้นที่สูงสุด อ.${arr[0].a}`);
+  }
+  if(rec.period && rec.period!=='ข้อมูลล่าสุด') subs.push(rec.period);
+  return {badge, cls, head, sub: subs.slice(0,3).join(' <span class="ai-dot">·</span> ')};
+}
 function buildAiSummaryHTML(){
   return DOMAINS.filter(d=>!d.overview).map(d=>{
-    const tot=provinceTotals(d.no);
     const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no):null;
-    let body;
-    const bd = rec && rec.breakdown? rec.breakdown : null;
-    if(bd && Object.keys(bd).length){
-      const parts=Object.keys(bd).filter(k=>bd[k]>0).map(k=>
-        `${k} <b>${bd[k].toLocaleString('th-TH')}</b>`);
-      body=`สถานการณ์${d.short} ทั้งจังหวัด: ${rec.metric} <b>${rec.value.toLocaleString('th-TH')}</b> ${rec.unit} <span class="ai-dot">•</span> ${parts.join(' <span class="ai-dot">•</span> ')}`;
-    } else if(tot && Object.values(tot).some(v=>v>0)){
-      const parts=Object.keys(tot).filter(k=>tot[k]>0).map(k=>
-        `${k} <b>${tot[k].toLocaleString('th-TH')}</b> ${EXTRA_UNITS[k]||''}`);
-      body=`สถานการณ์${d.short} ทั้งจังหวัด (ล่าสุด): ${parts.join(' <span class="ai-dot">•</span> ')}`;
-    } else if(rec && rec.hasData && rec.value>0){
-      body=`สถานการณ์${d.short} ทั้งจังหวัด (ล่าสุด): ${rec.metric} <b>${rec.value.toLocaleString('th-TH')}</b> ${rec.unit}`;
-    } else {
-      body=`สถานการณ์${d.short}: <span class="ai-wait">อยู่ระหว่างปรับปรุงข้อมูลจากหน่วยงานที่รับผิดชอบ</span>`;
-    }
-    return `<div class="ai-line" style="--ac:${d.hex}" onclick="gotoSlide(${d.no})">
-      <span class="ai-ic">${d.icon}</span><span class="ai-txt">${body}</span></div>`;
+    const B=domainBrief(d, rec);
+    return `<div class="ai-line ${B.cls}" style="--ac:${d.hex}" onclick="gotoSlide(${d.no})">
+      <span class="ai-ic">${d.icon}</span>
+      <div class="ai-body">
+        <div class="ai-top"><b class="ai-name">ด้าน ${d.no} ${d.short}</b><span class="ai-badge ${B.cls}">${B.badge}</span></div>
+        <div class="ai-head">${B.head}</div>
+        ${B.sub? `<div class="ai-sub">${B.sub}</div>`:''}
+      </div></div>`;
   }).join('');
 }
 function refreshAiSummary(){
   const el=document.getElementById('aiSum');
   if(el) el.innerHTML=buildAiSummaryHTML();
+  renderExecNarrative();
 }
 
 function drawGauge(cv, val){

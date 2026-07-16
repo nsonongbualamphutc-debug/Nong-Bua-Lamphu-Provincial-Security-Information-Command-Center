@@ -1616,6 +1616,35 @@ function domainBrief(d, rec){
     return {badge:'⏳ รอข้อมูล', cls:'wait',
             head:'อยู่ระหว่างการรายงานข้อมูลจากหน่วยงานที่รับผิดชอบ', sub:''};
 
+  /* ===== ด้าน 1 ยาเสพติด: สรุปเต็มรูปแบบเดียวกับแดชบอร์ดยาเสพติด ===== */
+  if(d.no===1){
+    const tot=provinceTotals(1)||{};
+    if((tot['คดี']||0)>0 || (tot['เข้าบำบัด']||0)>0){
+      const nf=v=>(v||0).toLocaleString('th-TH');
+      const goodTrend = rec.trend>0;
+      let head=`สถานการณ์ทั้งจังหวัด: จับกุม <b>${nf(tot['คดี'])} คดี</b> ผู้ต้องหา ${nf(tot['ผู้ต้องหา'])} คน • นำผู้เสพเข้าบำบัด <b>${nf(tot['เข้าบำบัด'])} คน</b> (สำเร็จ ${nf(tot['บำบัดสำเร็จ'])})`;
+      const drugs=[];
+      if(tot['ยาบ้า']>0) drugs.push(`ยาบ้า ${nf(tot['ยาบ้า'])} เม็ด`);
+      if(tot['ไอซ์']>0) drugs.push(`ไอซ์ ${(tot['ไอซ์']||0).toLocaleString('th-TH')} กรัม`);
+      if(drugs.length) head+=` • ของกลาง${drugs.join(' ')}`;
+      const subs=[];
+      const md=MAP_DATA && MAP_DATA.map && MAP_DATA.map[1];
+      if(md){
+        const top=key=>{
+          const arr=Object.keys(md).map(a=>({a,v:(md[a].extra&&md[a].extra[key])||0})).sort((x,y)=>y.v-x.v);
+          return (arr.length&&arr[0].v>0)? arr[0]:null;
+        };
+        const tc=top('คดี'), tt=top('เข้าบำบัด');
+        if(tc) subs.push(`พื้นที่จับกุมสูงสุด <b>อ.${tc.a}</b> (${nf(tc.v)} คดี)`);
+        if(tt) subs.push(`เข้าบำบัดสูงสุด <b>อ.${tt.a}</b> (${nf(tt.v)} คน)`);
+      }
+      if(rec.trend!==0) subs.push(`การเข้าบำบัดเทียบงวดก่อน ${rec.trend>0?'▲':'▼'} ${Math.abs(rec.trend)}%`);
+      if(rec.period) subs.push(rec.period);
+      return {badge: goodTrend?'🟢 ผลงานเด่น':'🔵 สถานะล่าสุด', cls: goodTrend?'good':'info',
+              head, sub: subs.slice(0,4).join(' <span class="ai-dot">·</span> ')};
+    }
+  }
+
   const bd=rec.breakdown||{};
   let done=0, all=0;
   Object.keys(bd).forEach(k=>{ all+=bd[k]; if(GOOD_STATUS.some(g=>k.includes(g))) done+=bd[k]; });

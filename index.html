@@ -675,6 +675,44 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .tk-dot.on{background:var(--ac);box-shadow:0 0 6px color-mix(in srgb,var(--ac) 60%, transparent)}
 .tk-count{font-family:'Chakra Petch';font-size:11.5px;color:var(--ink-dim);margin-left:6px}
 
+/* ================= LUX TOOLTIP ================= */
+.lux-tip{
+  position:fixed;z-index:1200;max-width:330px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(13,23,48,.98),rgba(8,14,32,.98));
+  border:1px solid rgba(240,199,94,.35);border-radius:15px;
+  padding:13px 15px;box-shadow:0 18px 50px rgba(0,0,0,.65);
+  opacity:0;transform:translateY(6px) scale(.98);transition:opacity .15s,transform .15s;
+  backdrop-filter:blur(10px);
+}
+.lux-tip.show{opacity:1;transform:none}
+.tp-head{--ac:var(--gold);display:flex;align-items:center;gap:9px;margin-bottom:9px;
+  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.09)}
+.tp-ic{font-size:17px}
+.tp-head b{font-family:'Kanit';font-weight:600;font-size:13.5px;color:#fff;flex:1}
+.tp-pill{font-family:'Kanit';font-size:10px;font-weight:600;color:#08130A;border-radius:99px;padding:2px 9px;flex:none}
+.tp-metric{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-family:'Kanit';font-size:12px;color:var(--ink-dim);margin-bottom:5px}
+.tp-metric b{font-family:'Chakra Petch';font-weight:700;font-size:22px;color:var(--gold-bright)}
+.tp-metric span{font-size:11.5px}
+.tp-row{font-size:12px;color:var(--ink);line-height:1.7;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tp-row.sm{font-size:11.5px}
+.tp-row.muted{color:var(--ink-dim)}
+.tp-row b{font-family:'Chakra Petch';font-weight:700}
+.tp-dot{width:7px;height:7px;border-radius:50%;flex:none}
+.tp-sec{font-family:'Kanit';font-weight:600;font-size:11px;color:var(--gold-bright);
+  margin:9px 0 5px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.09)}
+.tp-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:5px}
+.tp-grid div{display:flex;flex-direction:column}
+.tp-grid b{font-family:'Chakra Petch';font-weight:700;font-size:15px;color:#fff}
+.tp-grid span{font-size:10.5px;color:var(--ink-dim)}
+.tp-comp{display:grid;grid-template-columns:1fr 84px auto;align-items:center;gap:8px;
+  font-size:11px;color:var(--ink-dim);font-family:'Kanit';margin-bottom:4px}
+.tp-comp b{font-family:'Chakra Petch';font-weight:700;font-size:12.5px;color:var(--ink)}
+.tp-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;display:block}
+.tp-bar i{display:block;height:100%;border-radius:99px}
+.tp-foot{font-family:'Kanit';font-size:10.5px;color:var(--gold-bright);margin-top:9px;
+  padding-top:7px;border-top:1px solid rgba(255,255,255,.07);opacity:.8}
+@media(hover:none){.lux-tip{display:none}}  /* ทัชสกรีนใช้คลิกเข้าดูตรง ๆ */
+
 /* ----- อันดับความมั่นคงรายด้าน ----- */
 .rank-list{display:flex;flex-direction:column;gap:7px}
 .rank-item{
@@ -1200,6 +1238,7 @@ DOMAINS.forEach((d,i)=>{
   const el = document.createElement('article');
   el.className = 'card reveal';
   el.style.setProperty('--ac', d.hex);
+  if(!d.overview) el.dataset.tipno = d.no;
   el.innerHTML = `
     ${d.overview? '<span class="badge-live">สรุปอัตโนมัติ</span>' : ''}
     <div class="card-top">
@@ -1257,7 +1296,7 @@ function buildTicker(){
   const ordered = [...OVERVIEW.domains].sort((a,b)=>a.no-b.no);
   const items = ordered.map(o=>{
     const d = DOMAINS[o.no-1];
-    return `<span class="tick-item" onclick="openPresent(${o.no-1})">
+    return `<span class="tick-item" data-tipno="${o.no}" onclick="openPresent(${o.no-1})">
       <span class="st" style="background:${stClr[o.status]||'var(--ink-dim)'}"></span>
       <b>ด้านที่ ${o.no} ${d.short}</b> ${o.metric} <span class="v">${fmt(o.value)} ${o.unit}</span></span>`;
   }).join('');
@@ -1465,7 +1504,7 @@ function renderOverview(){
             const rep=o.reported||0;
             const dots=Array.from({length:6},(_,k)=>`<span class="tk-dot ${k<rep?'on':''}"></span>`).join('');
             const tr = o.trend>0? `<span class="trend up">▲ ${o.trend}%</span>` : o.trend<0? `<span class="trend down">▼ ${Math.abs(o.trend)}%</span>` : `<span class="trend flat">—</span>`;
-            return `<div class="track-item" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
+            return `<div class="track-item" data-tipno="${o.no}" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
               <div class="tk-head"><span>${d.icon}</span><b>ด้าน ${o.no} ${d.short}</b>${tr}</div>
               <div class="tk-period">${o.period? '🗓 '+o.period : '<span class="ai-wait">ยังไม่มีการรายงาน</span>'}</div>
               <div class="tk-dots">${dots}<span class="tk-count">${rep}/6 อำเภอ</span></div>
@@ -1514,7 +1553,7 @@ function renderOverview(){
       borderColor:ov.domains.map(o=>DOMAINS[o.no-1].hex), borderWidth:1.5, borderRadius:7}]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' ดัชนีย่อย '+c.parsed.x+' / 100'}}},
+      plugins:{legend:{display:false}, tooltip:{enabled:false, external:chartTip}},
       scales:{
         x:{min:0,max:100,grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#93A3C9',font:{family:'Chakra Petch'}}},
         y:{grid:{display:false},ticks:{color:'#C7D2EE',font:{family:'Kanit',size:12}}}
@@ -1539,7 +1578,7 @@ function renderOverview(){
     },
     options:{
       responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' ดัชนี '+c.parsed.r+' / 100'}}},
+      plugins:{legend:{display:false}, tooltip:{enabled:false, external:chartTip}},
       scales:{ r:{
         min:0, max:100, beginAtZero:true,
         grid:{color:'rgba(255,255,255,.1)'}, angleLines:{color:'rgba(255,255,255,.1)'},
@@ -1562,7 +1601,7 @@ function renderRanking(){
     const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span class="rk-no">${i+1}</span>`;
     const trend = o.trend>0?`<span class="rk-tr up">▲${Math.abs(o.trend)}%</span>`
                 : o.trend<0?`<span class="rk-tr down">▼${Math.abs(o.trend)}%</span>`:'';
-    return `<div class="rank-item" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
+    return `<div class="rank-item" data-tipno="${o.no}" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
       <div class="rk-medal">${medal}</div>
       <div class="rk-ic">${d.icon}</div>
       <div class="rk-name">${d.short} ${trend}</div>
@@ -1571,6 +1610,127 @@ function renderRanking(){
       <div class="rk-st" style="color:${stColor(o.status)}">${stText(o)}</div>
     </div>`;
   }).join('');
+}
+
+/* ================= LUX TOOLTIP: ชี้ปุ๊บเห็นไส้ใน ================= */
+const REPORT_DISTRICTS={1:true};
+/* คำนวณองค์ประกอบดัชนี (สูตรเดียวกับ GAS) เพื่อโชว์ที่มาของคะแนน */
+function indexParts(o){
+  if(!o.hasData) return null;
+  const a = REPORT_DISTRICTS[o.no]? Math.round(40*Math.min(1,(o.reported||0)/6)) : 40;
+  let b=20, done=0, all=0;
+  const bd=o.breakdown||{};
+  Object.keys(bd).forEach(k=>{ all+=bd[k]; if(GOOD_STATUS.some(g=>k.includes(g))) done+=bd[k]; });
+  if(all>0) b=Math.round(40*(0.25+0.75*(done/all)));
+  let c=10;
+  if(o.trend!==0){
+    const hb=HIGHER_BETTER[o.no]!==false;
+    const goodDir=hb? o.trend>0 : o.trend<0;
+    const mag=Math.min(1,Math.abs(o.trend)/30);
+    c=Math.round(goodDir? 10+10*mag : 10-10*mag);
+  }
+  return {a,b,c,done,all};
+}
+function tipBar(v,max,color){
+  return `<span class="tp-bar"><i style="width:${Math.min(100,v/max*100)}%;background:${color}"></i></span>`;
+}
+function tipHTML(no){
+  const d=DOMAINS[no-1];
+  const o=OVERVIEW.domains? OVERVIEW.domains.find(x=>x.no===no):null;
+  if(!o) return '';
+  const stC=o.status==='ok'?'var(--ok)':o.status==='warn'?'var(--warn)':'var(--danger)';
+  const stT=!o.hasData?'รอข้อมูล':o.status==='ok'?'ปกติ':o.status==='warn'?'เฝ้าระวัง':'เร่งด่วน';
+  let h=`<div class="tp-head" style="--ac:${d.hex}"><span class="tp-ic">${d.icon}</span>
+    <b>ด้าน ${no} ${d.short}</b><span class="tp-pill" style="background:${stC}">${stT}</span></div>`;
+  if(!o.hasData){
+    h+=`<div class="tp-row muted">อยู่ระหว่างการรายงานข้อมูลจากหน่วยงานที่รับผิดชอบ</div>`;
+    return h;
+  }
+  /* ตัวชี้วัดหลัก */
+  h+=`<div class="tp-metric">${o.metric}<b>${o.value.toLocaleString('th-TH')}</b><span>${o.unit}</span></div>`;
+  if(o.period) h+=`<div class="tp-row muted">🗓 ${o.period}${REPORT_DISTRICTS[no]?` · รายงาน ${o.reported}/6 อำเภอ`:''}</div>`;
+  if(o.trend!==0){
+    const hb=HIGHER_BETTER[no]!==false;
+    const good=hb? o.trend>0 : o.trend<0;
+    h+=`<div class="tp-row">${o.trend>0?'▲':'▼'} <b style="color:${good?'var(--ok)':'var(--danger)'}">${Math.abs(o.trend)}%</b> เทียบงวดก่อน ${good?'(ทิศทางดี)':'(ควรติดตาม)'}</div>`;
+  }
+  /* สถานะเรื่อง */
+  const bd=o.breakdown||{};
+  if(Object.keys(bd).length){
+    h+=`<div class="tp-sec">สถานะเรื่อง</div>`;
+    h+=Object.keys(bd).map(k=>{
+      const good=GOOD_STATUS.some(g=>k.includes(g));
+      return `<div class="tp-row sm"><span class="tp-dot" style="background:${good?'var(--ok)':'var(--warn)'}"></span>${k} <b>${bd[k]}</b></div>`;
+    }).join('');
+  }
+  /* สถิติเด็ดด้าน 1 */
+  if(no===1 && o.rich){
+    const R=o.rich, nf=v=>(v||0).toLocaleString('th-TH');
+    h+=`<div class="tp-sec">ผลงานปี ${R.year||''}</div>
+        <div class="tp-grid">
+          <div><b>${nf(R.cases)}</b><span>คดี</span></div>
+          <div><b>${nf(R.suspects)}</b><span>ผู้ต้องหา</span></div>
+          <div><b>${nf(R.meth)}</b><span>ยาบ้า (เม็ด)</span></div>
+          <div><b>${nf(R.treat)}</b><span>เข้าบำบัด</span></div>
+        </div>`;
+    if(R.topCase) h+=`<div class="tp-row sm">📍 จับกุมสูงสุด <b>อ.${R.topCase.d}</b> (${nf(R.topCase.v)} คดี)</div>`;
+  }
+  /* องค์ประกอบดัชนี */
+  const P=indexParts(o);
+  if(P){
+    h+=`<div class="tp-sec">ที่มาของดัชนี <b style="color:${stC}">${o.index}</b>/100</div>
+      <div class="tp-comp"><span>การรายงานข้อมูล</span>${tipBar(P.a,40,'var(--c2)')}<b>${P.a}</b>/40</div>
+      <div class="tp-comp"><span>ผลการดำเนินงาน</span>${tipBar(P.b,40,'var(--ok)')}<b>${P.b}</b>/40</div>
+      <div class="tp-comp"><span>แนวโน้ม</span>${tipBar(P.c,20,'var(--gold)')}<b>${P.c}</b>/20</div>`;
+  }
+  h+=`<div class="tp-foot">คลิกเพื่อเปิดแดชบอร์ดด้านนี้ ›</div>`;
+  return h;
+}
+/* กล่อง tooltip ลอยตัวเดียวทั้งหน้า */
+let tipEl=null;
+function ensureTip(){
+  if(tipEl) return tipEl;
+  tipEl=document.createElement('div');
+  tipEl.className='lux-tip'; tipEl.id='luxTip';
+  document.body.appendChild(tipEl);
+  return tipEl;
+}
+function showTip(html,x,y){
+  const t=ensureTip();
+  t.innerHTML=html; t.classList.add('show');
+  moveTip(x,y);
+}
+function moveTip(x,y){
+  if(!tipEl) return;
+  const w=tipEl.offsetWidth, h=tipEl.offsetHeight;
+  let L=x+18, T=y+14;
+  if(L+w>innerWidth-10) L=x-w-18;
+  if(T+h>innerHeight-10) T=y-h-14;
+  tipEl.style.left=Math.max(8,L)+'px'; tipEl.style.top=Math.max(8,T)+'px';
+}
+function hideTip(){ tipEl&&tipEl.classList.remove('show'); }
+/* ผูกกับทุก element ที่มี data-tipno (event delegation) */
+document.addEventListener('mouseover',e=>{
+  const el=e.target.closest('[data-tipno]');
+  if(el){ showTip(tipHTML(+el.dataset.tipno), e.clientX, e.clientY); }
+});
+document.addEventListener('mousemove',e=>{
+  const el=e.target.closest('[data-tipno]');
+  if(el) moveTip(e.clientX,e.clientY); else hideTip();
+});
+document.addEventListener('scroll',hideTip,true);
+
+
+/* external tooltip สำหรับ Chart.js ใช้การ์ดเจาะลึกเดียวกัน */
+function chartTip(ctx){
+  const tt=ctx.tooltip;
+  if(!tt || tt.opacity===0){ hideTip(); return; }
+  const dp=tt.dataPoints&&tt.dataPoints[0];
+  if(!dp) return;
+  const no=OVERVIEW.domains[dp.dataIndex]?.no;
+  if(!no) return;
+  const rect=ctx.chart.canvas.getBoundingClientRect();
+  showTip(tipHTML(no), rect.left+tt.caretX, rect.top+tt.caretY);
 }
 
 /* -------- อันดับความมั่นคงรายด้าน (จบ) -------- */
@@ -1764,7 +1924,7 @@ function buildAiSummaryHTML(){
   return DOMAINS.filter(d=>!d.overview).map(d=>{
     const rec=OVERVIEW.domains? OVERVIEW.domains.find(o=>o.no===d.no):null;
     const B=domainBrief(d, rec);
-    return `<div class="ai-line ${B.cls}" style="--ac:${d.hex}" onclick="gotoSlide(${d.no})">
+    return `<div class="ai-line ${B.cls}" data-tipno="${d.no}" style="--ac:${d.hex}" onclick="gotoSlide(${d.no})">
       <span class="ai-ic">${d.icon}</span>
       <div class="ai-body">
         <div class="ai-top"><b class="ai-name">ด้าน ${d.no} ${d.short}</b><span class="ai-badge ${B.cls}">${B.badge}</span></div>

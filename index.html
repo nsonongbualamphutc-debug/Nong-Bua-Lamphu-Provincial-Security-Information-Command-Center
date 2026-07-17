@@ -675,6 +675,30 @@ h1,h2,h3,.kanit{font-family:'Kanit',sans-serif}
 .tk-dot.on{background:var(--ac);box-shadow:0 0 6px color-mix(in srgb,var(--ac) 60%, transparent)}
 .tk-count{font-family:'Chakra Petch';font-size:11.5px;color:var(--ink-dim);margin-left:6px}
 
+/* ----- อันดับความมั่นคงรายด้าน ----- */
+.rank-list{display:flex;flex-direction:column;gap:7px}
+.rank-item{
+  --ac:var(--gold);
+  display:grid;grid-template-columns:28px 24px 1fr 90px 34px 62px;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:.2s;
+}
+.rank-item:hover{background:rgba(255,255,255,.05);transform:translateX(3px);border-color:color-mix(in srgb,var(--ac) 40%,transparent)}
+.rk-medal{font-size:16px;text-align:center}
+.rk-no{font-family:'Chakra Petch';font-weight:700;font-size:13px;color:var(--ink-dim)}
+.rk-ic{font-size:16px;text-align:center}
+.rk-name{font-family:'Kanit';font-size:13px;color:var(--ink);display:flex;align-items:center;gap:7px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-tr{font-family:'Chakra Petch';font-size:10.5px;font-weight:700;flex:none}
+.rk-tr.up{color:var(--ok)} .rk-tr.down{color:var(--danger)}
+.rk-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.rk-bar i{display:block;height:100%;border-radius:99px;transition:width .8s ease}
+.rk-val{font-family:'Chakra Petch';font-weight:700;font-size:17px;text-align:right}
+.rk-st{font-family:'Kanit';font-size:11px;text-align:right}
+@media(max-width:560px){
+  .rank-item{grid-template-columns:24px 20px 1fr 44px 40px;gap:7px;padding:7px 9px}
+  .rank-item .rk-bar{display:none}
+}
+
 /* ----- สูตรดัชนีอัตโนมัติ ----- */
 .idx-formula{
   margin-top:14px;border:1px dashed rgba(240,199,94,.35);border-radius:11px;
@@ -1395,6 +1419,10 @@ function renderOverview(){
         </div>
       </div>
       <div class="ov-panel">
+        <h4>🏆 อันดับความมั่นคงรายด้าน <span class="tag2">DOMAIN RANKING</span></h4>
+        <div class="rank-list" id="rankList"></div>
+      </div>
+      <div class="ov-panel">
         <h4>🛡️ โปรไฟล์ความมั่นคงจังหวัด <span class="tag2">SECURITY PROFILE</span></h4>
         <div class="chart-box"><canvas id="ovRadar"></canvas></div>
       </div>
@@ -1466,6 +1494,7 @@ function renderOverview(){
   drawGauge(document.getElementById('ovGauge'), idx);
   renderAlerts('ovAlerts');
   renderExecNarrative();
+  renderRanking();
   buildFcChips();
   renderForecast(fcDomain);
   if(!TREND_DATA) loadTrendData();
@@ -1520,6 +1549,31 @@ function renderOverview(){
     }
   });
 }
+
+/* -------- อันดับความมั่นคงรายด้าน -------- */
+function renderRanking(){
+  const box=document.getElementById('rankList');
+  if(!box || !OVERVIEW.domains) return;
+  const ranked=[...OVERVIEW.domains].sort((a,b)=>b.index-a.index);
+  const stColor=s=>s==='ok'?'var(--ok)':s==='warn'?'var(--warn)':'var(--danger)';
+  const stText=(o)=>!o.hasData?'รอข้อมูล':o.status==='ok'?'ปกติ':o.status==='warn'?'เฝ้าระวัง':'เร่งด่วน';
+  box.innerHTML=ranked.map((o,i)=>{
+    const d=DOMAINS[o.no-1];
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span class="rk-no">${i+1}</span>`;
+    const trend = o.trend>0?`<span class="rk-tr up">▲${Math.abs(o.trend)}%</span>`
+                : o.trend<0?`<span class="rk-tr down">▼${Math.abs(o.trend)}%</span>`:'';
+    return `<div class="rank-item" style="--ac:${d.hex}" onclick="gotoSlide(${o.no})">
+      <div class="rk-medal">${medal}</div>
+      <div class="rk-ic">${d.icon}</div>
+      <div class="rk-name">${d.short} ${trend}</div>
+      <div class="rk-bar"><i style="width:${o.index}%;background:${stColor(o.status)}"></i></div>
+      <div class="rk-val" style="color:${stColor(o.status)}">${o.index}</div>
+      <div class="rk-st" style="color:${stColor(o.status)}">${stText(o)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* -------- อันดับความมั่นคงรายด้าน (จบ) -------- */
 
 /* -------- บทสรุปผู้บริหารเชิงบรรยาย (สไตล์เดียวกับแดชบอร์ดยาเสพติด) -------- */
 function buildExecNarrative(){

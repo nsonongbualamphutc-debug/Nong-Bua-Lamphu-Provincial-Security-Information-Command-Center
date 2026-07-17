@@ -1553,6 +1553,7 @@ function renderOverview(){
       borderColor:ov.domains.map(o=>DOMAINS[o.no-1].hex), borderWidth:1.5, borderRadius:7}]},
     options:{
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'nearest', axis:'y', intersect:false},
       plugins:{legend:{display:false}, tooltip:{enabled:false, external:chartTip}},
       scales:{
         x:{min:0,max:100,grid:{color:'rgba(255,255,255,.07)'},ticks:{color:'#93A3C9',font:{family:'Chakra Petch'}}},
@@ -1578,6 +1579,7 @@ function renderOverview(){
     },
     options:{
       responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'nearest', intersect:false},
       plugins:{legend:{display:false}, tooltip:{enabled:false, external:chartTip}},
       scales:{ r:{
         min:0, max:100, beginAtZero:true,
@@ -1716,7 +1718,8 @@ document.addEventListener('mouseover',e=>{
 });
 document.addEventListener('mousemove',e=>{
   const el=e.target.closest('[data-tipno]');
-  if(el) moveTip(e.clientX,e.clientY); else hideTip();
+  if(el) moveTip(e.clientX,e.clientY);
+  else if(!e.target.closest('.chart-box')) hideTip();   /* บนกราฟ ให้ chartTip จัดการเอง */
 });
 document.addEventListener('scroll',hideTip,true);
 
